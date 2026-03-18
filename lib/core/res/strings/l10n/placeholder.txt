@@ -1,0 +1,1 @@
+ARB localization files (en, th, zh) will be placed here.
