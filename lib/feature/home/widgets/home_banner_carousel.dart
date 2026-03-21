@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 class HomeBannerCarousel extends StatefulWidget {
@@ -10,104 +11,53 @@ class HomeBannerCarousel extends StatefulWidget {
 class _HomeBannerCarouselState extends State<HomeBannerCarousel> {
   final _controller = PageController(viewportFraction: 1);
   int _index = 0;
+  Timer? _timer;
+  final int total = 3;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (_controller.hasClients) {
+        int nextIndex = (_index + 1) % total;
+        _controller.animateToPage(
+          nextIndex,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
 
   @override
   void dispose() {
+    _timer?.cancel();
     _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    const total = 3;
-
     return Column(
       children: [
         AspectRatio(
-          aspectRatio: 343 / 140,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: PageView.builder(
-              controller: _controller,
-              itemCount: total,
-              onPageChanged: (v) => setState(() => _index = v),
-              itemBuilder: (context, i) {
-                return DecoratedBox(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFFF7B3BE), Color(0xFFFAD0B6)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.9),
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
-                                child: const Text(
-                                  'Banner placeholder',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                              const Spacer(),
-                              Text(
-                                'โปรโมชัน #${i + 1}',
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              const Text(
-                                'ส่วนรูปภาพจะใส่เพิ่มทีหลัง',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF424242),
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Container(
-                          width: 88,
-                          height: 88,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.55),
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.7),
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.image_outlined,
-                            color: Color(0xFF616161),
-                            size: 32,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+          aspectRatio: 343 / 200,
+          child: PageView.builder(
+            controller: _controller,
+            itemCount: total,
+            onPageChanged: (index) {
+              setState(() {
+                _index = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              return Image.asset(
+                'assets/images/banner/Frame2087327902.png',
+                width: 140,
+                height: 140,
+                fit: BoxFit.contain,
+              );
+            },
           ),
         ),
         const SizedBox(height: 8),
@@ -118,8 +68,8 @@ class _HomeBannerCarouselState extends State<HomeBannerCarousel> {
             (i) => AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               margin: const EdgeInsets.symmetric(horizontal: 3),
-              height: 6,
-              width: i == _index ? 18 : 6,
+              height: 10,
+              width: i == _index ? 30 : 10,
               decoration: BoxDecoration(
                 color: i == _index
                     ? const Color(0xFF15B34A)
@@ -133,4 +83,3 @@ class _HomeBannerCarouselState extends State<HomeBannerCarousel> {
     );
   }
 }
-

@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeAppBar extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  const HomeAppBar({
-    super.key,
-    required this.title,
-    required this.subtitle,
-  });
+  const HomeAppBar({super.key, required this.title, required this.subtitle});
 
   @override
   Widget build(BuildContext context) {
@@ -48,16 +45,18 @@ class HomeAppBar extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: 8),
-        _IconPillButton(
-          icon: Icons.calendar_month_rounded,
-          onPressed: () {},
+        SvgPicture.asset(
+          'assets/svg/ic_calendar.svg',
+          width: 24,
+          height: 24,
+        ),
+        const SizedBox(width: 15),
+        SvgPicture.asset(
+          'assets/svg/ic_bell.svg',
+          width: 24,
+          height: 24,
         ),
         const SizedBox(width: 8),
-        _IconPillButton(
-          icon: Icons.notifications_none_rounded,
-          onPressed: () {},
-        ),
       ],
     );
   }
@@ -67,10 +66,7 @@ class _IconPillButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onPressed;
 
-  const _IconPillButton({
-    required this.icon,
-    required this.onPressed,
-  });
+  const _IconPillButton({required this.icon, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -89,4 +85,3 @@ class _IconPillButton extends StatelessWidget {
     );
   }
 }
-
