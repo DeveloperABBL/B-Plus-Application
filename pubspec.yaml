@@ -15,12 +15,13 @@ dependencies:
   dio: ^5.9.2
   retrofit: ^4.9.2
   flutter_svg: ^2.0.17
+  material: ^1.0.1
+  dotted_line: ^3.2.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  flutter_svg: ^2.2.4
 
 flutter:
   uses-material-design: true
@@ -29,3 +30,5 @@ flutter:
     - assets/svg/
     - assets/images/BrownyPlusLogo.png
     - assets/images/banner/
+    - assets/images/clock/
+    - assets/images/home_menu/

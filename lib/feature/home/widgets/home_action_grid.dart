@@ -7,20 +7,16 @@ class HomeActionGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final actions = <_Action>[
       const _Action(
-        label: 'สร้างออเดอร์\nซัก อบ พับ',
-        icon: Icons.local_laundry_service_rounded,
+        imagePath: 'assets/images/home_menu/create_order.png',
       ),
       const _Action(
-        label: 'งานทั้งหมด',
-        icon: Icons.list_alt_rounded,
+        imagePath: 'assets/images/home_menu/task.png',
       ),
       const _Action(
-        label: 'รีวิว',
-        icon: Icons.people_alt_rounded,
+        imagePath: 'assets/images/home_menu/review.png',
       ),
       const _Action(
-        label: 'โปรโมชั่น',
-        icon: Icons.local_offer_rounded,
+        imagePath: 'assets/images/home_menu/promotion.png',
       ),
     ];
 
@@ -61,36 +57,16 @@ class _ActionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: const Color(0xFFE8F5E9),
+      color: Colors.transparent,
       borderRadius: BorderRadius.circular(18),
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
         onTap: () {},
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFFE0E0E0)),
-                ),
-                child: Icon(action.icon, color: const Color(0xFF15B34A)),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  action.label,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w900,
-                    height: 1.2,
-                  ),
-                ),
-              ),
-            ],
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(18),
+          child: Image.asset(
+            action.imagePath,
+            fit: BoxFit.cover,
           ),
         ),
       ),
@@ -99,9 +75,7 @@ class _ActionTile extends StatelessWidget {
 }
 
 class _Action {
-  final String label;
-  final IconData icon;
+  final String imagePath;
 
-  const _Action({required this.label, required this.icon});
+  const _Action({required this.imagePath});
 }
-

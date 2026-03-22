@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:dotted_line/dotted_line.dart';
 
 class HomeCheckinCard extends StatelessWidget {
   const HomeCheckinCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    const cardRadius = 14.0;
+    const cardRadius = 5.0;
     const outerBg = Color(0xFFE9FFDF);
     const outerBorder = Color(0xFFCFEFBD);
 
     return Container(
       decoration: BoxDecoration(
         color: outerBg,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: outerBorder),
         boxShadow: const [
           BoxShadow(
@@ -23,7 +25,7 @@ class HomeCheckinCard extends StatelessWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(8),
         child: Column(
           children: [
             // Header strip
@@ -39,10 +41,10 @@ class HomeCheckinCard extends StatelessWidget {
                       color: const Color(0xFFBFEFC3),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(
-                      Icons.description_outlined,
-                      size: 16,
-                      color: Color(0xFF2E7D32),
+                    child: SvgPicture.asset(
+                      'assets/svg/ic_note.svg',
+                      width: 24,
+                      height: 24,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -51,8 +53,8 @@ class HomeCheckinCard extends StatelessWidget {
                       'บันทึกเวลาเข้า-ออกงาน',
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        color: Color(0xFF2E7D32),
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF555555),
                       ),
                     ),
                   ),
@@ -65,7 +67,7 @@ class HomeCheckinCard extends StatelessWidget {
               child: Column(
                 children: [
                   SizedBox(
-                    height: 128,
+                    height: 140,
                     child: Row(
                       children: [
                         Expanded(
@@ -76,39 +78,50 @@ class HomeCheckinCard extends StatelessWidget {
                             timeIn: '9.50',
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: _PunchCard(
-                            radius: cardRadius,
-                            backgroundColor: const Color(0xFFCFEAFF),
-                            bottomBarColor: const Color(0xFFB9D7EA),
-                            bottomText: 'บันทึกเวลาเข้า',
-                            badge: null,
-                            primaryButton: null,
-                          ),
+                        const SizedBox(width: 8),
+                        const _VerticalDashedDivider(color: Color(0xFFB7E0A5)),
+                        const SizedBox(width: 8),
+                        Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.topCenter,
+                          children: [
+                            Image.asset(
+                              'assets/images/clock/clockin.png',
+                              height: 150,
+                            ),
+                            Positioned(
+                              top: -8,
+                              child: Image.asset(
+                                'assets/images/clock/repeat_badge.png',
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: _PunchCard(
-                            radius: cardRadius,
-                            backgroundColor: const Color(0xFFFFD3CC),
-                            bottomBarColor: const Color(0xFF15B34A),
-                            bottomText: 'บันทึกเวลาออก',
-                            badge: const _TopBadge(
-                              text: 'อย่าลืมนะ',
-                              color: Color(0xFFEB5757),
+                        const SizedBox(width: 8),
+                        Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.topCenter,
+                          children: [
+                            Image.asset(
+                              'assets/images/clock/clocked_out.png',
+                              height: 150,
                             ),
-                            primaryButton: const _PrimaryPill(
-                              text: 'บันทึกเวลาออก',
-                              background: Color(0xFF15B34A),
-                              foreground: Colors.white,
-                            ),
-                          ),
+                            // Image.asset(
+                            //   'assets/images/clock/clockout.png',
+                            //   height: 150,
+                            // ),
+                            // Positioned(
+                            //   top: -8,
+                            //   child: Image.asset(
+                            //     'assets/images/clock/repeat_badge.png',
+                            //   ),
+                            // ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   _BottomInfoBar(
                     radius: cardRadius,
                     leadingIcon: Icons.calendar_month_rounded,
@@ -142,34 +155,48 @@ class _BottomInfoBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: const Color(0xFFFFF3CF),
-      borderRadius: BorderRadius.circular(radius),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(radius),
+        side: const BorderSide(color: Color(0xFFFFE7AB), width: 1.5),
+      ),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         borderRadius: BorderRadius.circular(radius),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           child: Row(
             children: [
               Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFE7AB),
-                  borderRadius: BorderRadius.circular(10),
+                width: 28,
+                height: 28,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFFFE7AB),
+                  shape: BoxShape.circle,
                 ),
-                child: Icon(leadingIcon, color: const Color(0xFFB97900)),
+                alignment: Alignment.center,
+                child: SvgPicture.asset(
+                  'assets/svg/ic_calendar_yellow.svg',
+                  width: 18,
+                  height: 18,
+                ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   text,
                   style: const TextStyle(
+                    fontSize: 13,
                     fontWeight: FontWeight.w800,
                     color: Color(0xFF6D4C00),
                   ),
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded, color: Color(0xFF8D6E63)),
+              const Icon(
+                Icons.chevron_right_rounded,
+                size: 20,
+                color: Color(0xFF8D6E63),
+              ),
             ],
           ),
         ),
@@ -194,116 +221,103 @@ class _DateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(radius),
+        borderRadius: BorderRadius.circular(radius * 1.5),
+        border: Border.all(color: const Color(0xFFE8E8E8)),
       ),
-      child: _DashedBorder(
-        radius: radius - 2,
-        color: const Color(0xFFBDBDBD),
-        strokeWidth: 1.2,
-        dashWidth: 6,
-        dashGap: 4,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-          child: Column(
-            children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF5F5F5),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    month,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w900,
-                      color: Color(0xFF616161),
-                    ),
-                  ),
-                ),
+      padding: const EdgeInsets.all(5),
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 3),
+            decoration: BoxDecoration(
+              color: const Color(0xFFDCF8C6),
+              borderRadius: BorderRadius.circular(radius),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              month,
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF616161),
+                fontSize: 12,
               ),
-              const Spacer(),
-              Text(
-                day,
-                style: const TextStyle(
-                  fontSize: 44,
-                  height: 1,
-                  fontWeight: FontWeight.w900,
-                  color: Color(0xFF424242),
-                ),
-              ),
-              const Spacer(),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF5F5F5),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            timeIn,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w900,
-                              color: Color(0xFF424242),
-                            ),
-                          ),
-                          const SizedBox(height: 1),
-                          const Text(
-                            'เวลาเข้า',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF757575),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF5F5F5),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Column(
-                        children: [
-                          Text(
-                            '--',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              color: Color(0xFFBDBDBD),
-                            ),
-                          ),
-                          SizedBox(height: 1),
-                          Text(
-                            'เวลาออก',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFFBDBDBD),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
-        ),
+          const SizedBox(height: 4),
+          const _DashedDivider(color: Color(0xFFE0E0E0)),
+          const Spacer(),
+          Text(
+            day,
+            style: const TextStyle(
+              fontSize: 42,
+              height: 1,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF555555),
+            ),
+          ),
+          const Spacer(),
+          const Divider(color: Color(0xFFE0E0E0), height: 1, thickness: 1),
+          const SizedBox(height: 4),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF7F7F7),
+              borderRadius: BorderRadius.circular(radius),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      Text(
+                        timeIn,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF616161),
+                        ),
+                      ),
+                      const SizedBox(height: 1),
+                      const Text(
+                        'เวลาเข้า',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF9E9E9E),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(width: 1, height: 20, color: const Color(0xFFE0E0E0)),
+                const Expanded(
+                  child: Column(
+                    children: [
+                      Text(
+                        '-',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFFBDBDBD),
+                        ),
+                      ),
+                      SizedBox(height: 1),
+                      Text(
+                        'เวลาออก',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFBDBDBD),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -347,8 +361,10 @@ class _PunchCard extends StatelessWidget {
               right: 0,
               child: Center(
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: badge!.color,
                     borderRadius: BorderRadius.circular(10),
@@ -451,118 +467,31 @@ class _DashedDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 2,
-      child: CustomPaint(painter: _DashedLinePainter(color: color)),
+    return DottedLine(
+      direction: Axis.horizontal,
+      lineLength: double.infinity,
+      lineThickness: 2.0,
+      dashLength: 8.0,
+      dashColor: color,
+      dashGapLength: 6.0,
     );
   }
 }
 
-class _DashedLinePainter extends CustomPainter {
+class _VerticalDashedDivider extends StatelessWidget {
   final Color color;
 
-  _DashedLinePainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke;
-
-    const dashWidth = 8.0;
-    const dashGap = 6.0;
-    var x = 0.0;
-
-    while (x < size.width) {
-      canvas.drawLine(Offset(x, 0), Offset(x + dashWidth, 0), paint);
-      x += dashWidth + dashGap;
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _DashedLinePainter oldDelegate) {
-    return oldDelegate.color != color;
-  }
-}
-
-class _DashedBorder extends StatelessWidget {
-  final Widget child;
-  final double radius;
-  final Color color;
-  final double strokeWidth;
-  final double dashWidth;
-  final double dashGap;
-
-  const _DashedBorder({
-    required this.child,
-    required this.radius,
-    required this.color,
-    required this.strokeWidth,
-    required this.dashWidth,
-    required this.dashGap,
-  });
+  const _VerticalDashedDivider({required this.color});
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _DashedRRectPainter(
-        radius: radius,
-        color: color,
-        strokeWidth: strokeWidth,
-        dashWidth: dashWidth,
-        dashGap: dashGap,
-      ),
-      child: child,
+    return DottedLine(
+      direction: Axis.vertical,
+      lineLength: double.infinity,
+      lineThickness: 2.0,
+      dashLength: 8.0,
+      dashColor: color,
+      dashGapLength: 6.0,
     );
-  }
-}
-
-class _DashedRRectPainter extends CustomPainter {
-  final double radius;
-  final Color color;
-  final double strokeWidth;
-  final double dashWidth;
-  final double dashGap;
-
-  _DashedRRectPainter({
-    required this.radius,
-    required this.color,
-    required this.strokeWidth,
-    required this.dashWidth,
-    required this.dashGap,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rrect = RRect.fromRectAndRadius(
-      Offset.zero & size,
-      Radius.circular(radius),
-    );
-    final path = Path()..addRRect(rrect);
-
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke;
-
-    for (final metric in path.computeMetrics()) {
-      var distance = 0.0;
-      while (distance < metric.length) {
-        final next = distance + dashWidth;
-        final extract = metric.extractPath(distance, next);
-        canvas.drawPath(extract, paint);
-        distance = next + dashGap;
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _DashedRRectPainter oldDelegate) {
-    return oldDelegate.radius != radius ||
-        oldDelegate.color != color ||
-        oldDelegate.strokeWidth != strokeWidth ||
-        oldDelegate.dashWidth != dashWidth ||
-        oldDelegate.dashGap != dashGap;
   }
 }
