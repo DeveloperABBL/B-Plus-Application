@@ -15,57 +15,54 @@ class HomeScreen extends StatelessWidget {
     return HomeShell(
       currentIndex: 0,
       body: Container(
-        color: Colors.white,
-        child: SafeArea(
-          bottom: false,
-          child: Container(
-            color: const Color(0xFFF5F5F5),
-            child: CustomScrollView(
-              slivers: [
-                const SliverToBoxAdapter(
-                  child: ColoredBox(
-                    color: Colors.white,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(16, 12, 16, 20),
-                      child: HomeAppBar(
-                        title: 'บราวนี่ บราวนี่',
-                        subtitle: 'สาขาเทอร์มินอล 21 พระรามสาม',
-                      ),
+        color: const Color(0xFFF5F5F5),
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Container(
+                color: Colors.white,
+                child: const SafeArea(
+                  bottom: false,
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(16, 12, 16, 16),
+                    child: HomeAppBar(
+                      title: 'บราวนี่ บราวนี่',
+                      subtitle: 'สาขาเทอร์มินอล 21 พระรามสาม',
                     ),
                   ),
                 ),
-                const SliverToBoxAdapter(child: SizedBox(height: 16)),
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: HomeBannerCarousel(),
-                  ),
-                ),
-                const SliverToBoxAdapter(child: SizedBox(height: 12)),
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: HomeCheckinCard(),
-                  ),
-                ),
-                const SliverToBoxAdapter(child: SizedBox(height: 12)),
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: HomeServiceStatusSection(),
-                  ),
-                ),
-                const SliverToBoxAdapter(child: SizedBox(height: 12)),
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: HomeActionGrid(),
-                  ),
-                ),
-                const SliverToBoxAdapter(child: SizedBox(height: 18)),
-              ],
+              ),
             ),
-          ),
+            const SliverToBoxAdapter(child: SizedBox(height: 16)),
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: HomeBannerCarousel(),
+              ),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 12)),
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: HomeCheckinCard(),
+              ),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 12)),
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: HomeServiceStatusSection(),
+              ),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 12)),
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: HomeActionGrid(),
+              ),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 18)),
+          ],
         ),
       ),
     );

@@ -66,14 +66,14 @@ class _HomeBannerCarouselState extends State<HomeBannerCarousel> {
           children: List.generate(
             total,
             (i) => AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              height: 10,
-              width: i == _index ? 30 : 10,
+              duration: const Duration(milliseconds: 250),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              height: 6, // Slimmer indicators
+              width: i == _index ? 24 : 6,
               decoration: BoxDecoration(
                 color: i == _index
                     ? const Color(0xFF15B34A)
-                    : const Color(0xFFE0E0E0),
+                    : const Color(0xFFD0D0D0), // More subtle grey
                 borderRadius: BorderRadius.circular(999),
               ),
             ),

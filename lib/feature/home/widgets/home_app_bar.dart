@@ -11,11 +11,21 @@ class HomeAppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const CircleAvatar(
-          radius: 20,
-          backgroundColor: Color(0xFFE8F5E9),
-          foregroundColor: Color(0xFF15B34A),
-          child: Icon(Icons.person_rounded),
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
+          ),
+          child: ClipOval(
+            child: Image.asset(
+              'assets/images/banner/Frame2087327902.png', // Temporary placeholder that looks like the dog in the banner
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) =>
+                  const Icon(Icons.person_rounded, color: Color(0xFF15B34A)),
+            ),
+          ),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -27,36 +37,72 @@ class HomeAppBar extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 20, // Slightly larger
+                  fontWeight: FontWeight.w800, // Bolder
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 1),
               Text(
                 subtitle,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF757575),
-                  fontWeight: FontWeight.w500,
+                  fontSize: 13,
+                  color: Color(0xFF9E9E9E),
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
           ),
         ),
-        SvgPicture.asset(
-          'assets/svg/ic_calendar.svg',
-          width: 24,
-          height: 24,
+        _IconWithDot(
+          iconPath: 'assets/svg/ic_calendar.svg',
+          dotColor: const Color(0xFFFF4848), // Red dot
         ),
         const SizedBox(width: 15),
-        SvgPicture.asset(
-          'assets/svg/ic_bell.svg',
-          width: 24,
-          height: 24,
+        _IconWithDot(
+          iconPath: 'assets/svg/ic_bell.svg',
+          dotColor: const Color(0xFFFF4848), // Red dot
         ),
         const SizedBox(width: 8),
+      ],
+    );
+  }
+}
+
+class _IconWithDot extends StatelessWidget {
+  final String iconPath;
+  final Color dotColor;
+
+  const _IconWithDot({required this.iconPath, required this.dotColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        SvgPicture.asset(
+          iconPath,
+          width: 26,
+          height: 26,
+          colorFilter: const ColorFilter.mode(
+            Color(0xFF15B34A),
+            BlendMode.srcIn,
+          ),
+        ),
+        Positioned(
+          top: 0,
+          right: -1,
+          child: Container(
+            width: 9,
+            height: 9,
+            decoration: BoxDecoration(
+              color: dotColor,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 1.5),
+            ),
+          ),
+        ),
       ],
     );
   }
