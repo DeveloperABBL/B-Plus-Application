@@ -6,27 +6,15 @@ class HomeActionGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final actions = <_Action>[
-      const _Action(
-        imagePath: 'assets/images/home_menu/create_order.png',
-      ),
-      const _Action(
-        imagePath: 'assets/images/home_menu/task.png',
-      ),
-      const _Action(
-        imagePath: 'assets/images/home_menu/review.png',
-      ),
-      const _Action(
-        imagePath: 'assets/images/home_menu/promotion.png',
-      ),
+      const _Action(imagePath: 'assets/images/home_menu/create_order.png'),
+      const _Action(imagePath: 'assets/images/home_menu/task.png'),
+      const _Action(imagePath: 'assets/images/home_menu/review.png'),
+      const _Action(imagePath: 'assets/images/home_menu/promotion.png'),
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'เมนูด่วน',
-          style: TextStyle(fontWeight: FontWeight.w900),
-        ),
         const SizedBox(height: 10),
         LayoutBuilder(
           builder: (context, constraints) {
@@ -44,6 +32,7 @@ class HomeActionGrid extends StatelessWidget {
             );
           },
         ),
+        const SizedBox(height: 20),
       ],
     );
   }
@@ -64,10 +53,7 @@ class _ActionTile extends StatelessWidget {
         onTap: () {},
         child: ClipRRect(
           borderRadius: BorderRadius.circular(18),
-          child: Image.asset(
-            action.imagePath,
-            fit: BoxFit.cover,
-          ),
+          child: Image.asset(action.imagePath, fit: BoxFit.cover),
         ),
       ),
     );

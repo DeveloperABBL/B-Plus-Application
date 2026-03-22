@@ -79,8 +79,8 @@ class HomeCheckinCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const _VerticalDashedDivider(color: Color(0xFFB7E0A5)),
-                        const SizedBox(width: 8),
+                        // const _VerticalDashedDivider(color: Color(0xFFB7E0A5)),
+                        // const SizedBox(width: 8),
                         Stack(
                           clipBehavior: Clip.none,
                           alignment: Alignment.topCenter,
@@ -471,9 +471,9 @@ class _DashedDivider extends StatelessWidget {
       direction: Axis.horizontal,
       lineLength: double.infinity,
       lineThickness: 2.0,
-      dashLength: 8.0,
+      dashLength: 6.0,
       dashColor: color,
-      dashGapLength: 6.0,
+      dashGapLength: 4.0,
     );
   }
 }

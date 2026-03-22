@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeServiceStatusSection extends StatelessWidget {
   const HomeServiceStatusSection({super.key});
@@ -8,25 +9,36 @@ class HomeServiceStatusSection extends StatelessWidget {
     final items = <_ServiceItem>[
       const _ServiceItem(
         title: 'บริษัท ล. - 0800000000',
-        subtitle: 'สถานะ : ดำเนินการสำเร็จ\nบริการ : พับ',
+        statusText: 'สถานะ : ดำเนินการสำเร็จ',
+        serviceText: 'บริการ : พับ',
+        imagePath: 'assets/images/order/order1.png',
         statusTone: _StatusTone.success,
         actionLabel: 'ประเมินผล',
       ),
       const _ServiceItem(
         title: 'โวว - 0800000000',
-        subtitle: 'สถานะ : กำลังดำเนินการ + 24 นาที (เครื่องอบ 1)\nบริการ : ประเมินตัดจุดรอย',
+        statusText: 'สถานะ : กำลังดำเนินการ + 24 นาที (เครื่องอบ 1)',
+        serviceText: 'บริการ : ประเมินตัดจุดรอย',
+        imagePath: 'assets/images/order/order2.png',
         statusTone: _StatusTone.warning,
         actionLabel: 'รายละเอียดการซัก',
       ),
       const _ServiceItem(
         title: 'โวว - 0800000000',
-        subtitle: 'สถานะ : รอดำเนินการ\nบริการ : ประเมินตัดจุดรอย',
+        statusText: 'สถานะ : รอดำเนินการ',
+        serviceText: 'บริการ : ประเมินตัดจุดรอย',
+        imagePath: 'assets/images/order/order3.png',
         statusTone: _StatusTone.neutral,
         actionLabel: 'รายละเอียดการซัก',
       ),
     ];
 
     return _SectionCard(
+      icon: SvgPicture.asset(
+        'assets/svg/ic_refresh_double.svg',
+        width: 24,
+        height: 24,
+      ),
       title: 'สถานะการบริการซัก อบ พับ',
       child: Column(
         children: [
@@ -80,7 +92,8 @@ class _ServiceRow extends StatelessWidget {
               color: const Color(0xFFF5F5F5),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(Icons.image_outlined, color: Color(0xFF757575)),
+            clipBehavior: Clip.antiAlias,
+            child: Image.asset(item.imagePath, fit: BoxFit.cover),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -93,7 +106,16 @@ class _ServiceRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  item.subtitle,
+                  item.statusText,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF616161),
+                    fontWeight: FontWeight.w500,
+                    height: 1.35,
+                  ),
+                ),
+                Text(
+                  item.serviceText,
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xFF616161),
@@ -127,27 +149,27 @@ class _StatusChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final (bg, fg, label) = switch (tone) {
       _StatusTone.success => (
-          const Color(0xFFE8F5E9),
-          const Color(0xFF1B5E20),
-          'สำเร็จ',
-        ),
+        const Color(0xFFD8FDE8),
+        const Color(0xFF15B51F),
+        'สำเร็จ',
+      ),
       _StatusTone.warning => (
-          const Color(0xFFFFF8E1),
-          const Color(0xFF8D6E00),
-          'กำลังทำ',
-        ),
+        const Color(0xFFFFF8E1),
+        const Color(0xFF8D6E00),
+        'ชำระโดยผู้จัดการสาขา',
+      ),
       _StatusTone.neutral => (
-          const Color(0xFFF5F5F5),
-          const Color(0xFF616161),
-          'รอดำเนินการ',
-        ),
+        const Color(0xFFF5F5F5),
+        const Color(0xFF616161),
+        'รอดำเนินการ',
+      ),
     };
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         label,
@@ -190,8 +212,9 @@ class _ActionPill extends StatelessWidget {
 class _SectionCard extends StatelessWidget {
   final String title;
   final Widget child;
+  final Widget? icon;
 
-  const _SectionCard({required this.title, required this.child});
+  const _SectionCard({required this.title, required this.child, this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -206,9 +229,17 @@ class _SectionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.w900),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (icon != null) ...[icon!, const SizedBox(width: 8)],
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.w900),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 10),
           child,
@@ -222,15 +253,18 @@ enum _StatusTone { success, warning, neutral }
 
 class _ServiceItem {
   final String title;
-  final String subtitle;
+  final String statusText;
+  final String serviceText;
+  final String imagePath;
   final _StatusTone statusTone;
   final String actionLabel;
 
   const _ServiceItem({
     required this.title,
-    required this.subtitle,
+    required this.statusText,
+    required this.serviceText,
+    required this.imagePath,
     required this.statusTone,
     required this.actionLabel,
   });
 }
-
