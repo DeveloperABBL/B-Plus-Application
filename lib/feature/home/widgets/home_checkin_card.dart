@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dotted_line/dotted_line.dart';
+import 'package:brownyplus/feature/home/widgets/home_checkin_popup.dart';
 
 class HomeCheckinCard extends StatelessWidget {
   const HomeCheckinCard({super.key});
@@ -81,42 +82,58 @@ class HomeCheckinCard extends StatelessWidget {
                         const SizedBox(width: 8),
                         // const _VerticalDashedDivider(color: Color(0xFFB7E0A5)),
                         // const SizedBox(width: 8),
-                        Stack(
-                          clipBehavior: Clip.none,
-                          alignment: Alignment.topCenter,
-                          children: [
-                            Image.asset(
-                              'assets/images/clock/clockin.png',
-                              height: 150,
-                            ),
-                            Positioned(
-                              top: -8,
-                              child: Image.asset(
-                                'assets/images/clock/repeat_badge.png',
+                        GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => const HomeCheckinPopup(),
+                            );
+                          },
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            alignment: Alignment.topCenter,
+                            children: [
+                              Image.asset(
+                                'assets/images/clock/clockin.png',
+                                height: 150,
                               ),
-                            ),
-                          ],
+                              Positioned(
+                                top: -8,
+                                child: Image.asset(
+                                  'assets/images/clock/repeat_badge.png',
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(width: 8),
-                        Stack(
-                          clipBehavior: Clip.none,
-                          alignment: Alignment.topCenter,
-                          children: [
-                            Image.asset(
-                              'assets/images/clock/clocked_out.png',
-                              height: 150,
-                            ),
-                            // Image.asset(
-                            //   'assets/images/clock/clockout.png',
-                            //   height: 150,
-                            // ),
-                            // Positioned(
-                            //   top: -8,
-                            //   child: Image.asset(
-                            //     'assets/images/clock/repeat_badge.png',
-                            //   ),
-                            // ),
-                          ],
+                        GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => const HomeCheckinPopup(),
+                            );
+                          },
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            alignment: Alignment.topCenter,
+                            children: [
+                              Image.asset(
+                                'assets/images/clock/clocked_out.png',
+                                height: 150,
+                              ),
+                              // Image.asset(
+                              //   'assets/images/clock/clockout.png',
+                              //   height: 150,
+                              // ),
+                              // Positioned(
+                              //   top: -8,
+                              //   child: Image.asset(
+                              //     'assets/images/clock/repeat_badge.png',
+                              //   ),
+                              // ),
+                            ],
+                          ),
                         ),
                       ],
                     ),

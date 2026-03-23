@@ -11,21 +11,12 @@ class BrownyLogo extends StatelessWidget {
         // โลโก้หลัก
         Image.asset(
           'assets/images/BrownyPlusLogo.png',
-          width: 140,
-          height: 140,
+          width: 180,
+          height: 180,
           fit: BoxFit.contain,
         ),
         const SizedBox(height: 16),
-        // ชื่อแอป
-        Text(
-          'Browny+',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-              ),
-        ),
       ],
     );
   }
 }
-

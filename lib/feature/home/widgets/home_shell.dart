@@ -91,7 +91,7 @@ class _HomeShellState extends State<HomeShell>
             height: 65,
             decoration: const BoxDecoration(
               ///กรอบปุ่มกลาง
-              color: Color.fromARGB(255, 57, 27, 27),
+              color: Color.fromARGB(255, 255, 255, 255),
               shape: BoxShape.circle,
             ),
             child: Padding(
