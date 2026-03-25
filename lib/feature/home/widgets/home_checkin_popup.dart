@@ -2,6 +2,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:brownyplus/core/widgets/primary_button.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:brownyplus/res/colors/app_colors.dart';
+import 'package:brownyplus/res/icons/assets.gen.dart';
+import 'package:brownyplus/res/dims/app_dims.dart';
+import 'package:brownyplus/res/styles/app_text_styles.dart';
 
 class HomeCheckinPopup extends StatelessWidget {
   const HomeCheckinPopup({super.key});
@@ -9,109 +13,113 @@ class HomeCheckinPopup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      insetPadding: const EdgeInsets.symmetric(horizontal: 0),
-      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppDims.size_24),
+      ),
+      insetPadding: EdgeInsets.zero,
+      backgroundColor: AppColors.white,
       surfaceTintColor: Colors.transparent,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(AppDims.size_20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Center(
+            Center(
               child: Text(
                 'บันทึกเวลาเข้างาน',
-                style: TextStyle(
-                  fontSize: 18,
+                style: AppTextStyles.titleMedium.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF6D4C41),
+                  color: AppColors.textPrimary,
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            AppDims.vericalPadding_24,
             RichText(
-              text: const TextSpan(
+              text: TextSpan(
                 children: [
                   TextSpan(
                     text: 'สื่อประกอบ',
-                    style: TextStyle(
-                      fontSize: 15,
+                    style: AppTextStyles.bodyMedium.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF6D4C41),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   TextSpan(
                     text: '*',
-                    style: TextStyle(
-                      fontSize: 16,
+                    style: AppTextStyles.bodyMedium.copyWith(
                       fontWeight: FontWeight.w700,
-                      color: Colors.red,
+                      color: AppColors.error,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 8),
+            AppDims.vericalPadding_8,
             _DashedMediaUpload(onTap: () {}),
-            const SizedBox(height: 16),
-            const Text(
+            AppDims.vericalPadding_16,
+            Text(
               'เวลา',
-              style: TextStyle(
-                fontSize: 14,
+              style: AppTextStyles.bodySmall.copyWith(
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF6D4C41),
+                color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            AppDims.vericalPadding_8,
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF1F1F1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE0E0E0)),
+              padding: EdgeInsets.symmetric(
+                horizontal: AppDims.size_16,
+                vertical: AppDims.size_14,
               ),
-              child: const Text(
+              decoration: BoxDecoration(
+                color: AppColors.inputFieldDefaultBg,
+                borderRadius: BorderRadius.circular(AppDims.size_12),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Text(
                 '9.50 น.',
-                style: TextStyle(fontSize: 15, color: Color(0xFF616161)),
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
               ),
             ),
-            const SizedBox(height: 16),
-            const Text(
+            AppDims.vericalPadding_16,
+            Text(
               'สาขา',
-              style: TextStyle(
-                fontSize: 14,
+              style: AppTextStyles.bodySmall.copyWith(
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF6D4C41),
+                color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            AppDims.vericalPadding_8,
             Container(
               width: double.infinity,
-              height: 52,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              height: AppDims.size_52,
+              padding: EdgeInsets.symmetric(horizontal: AppDims.size_16),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE0E0E0)),
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(AppDims.size_12),
+                border: Border.all(color: AppColors.border),
               ),
-              child: const Row(
+              child: Row(
                 children: [
                   Expanded(
                     child: Text(
                       'สาขาเทอร์มินอล 21 พระรามสาม',
-                      style: TextStyle(fontSize: 15, color: Color(0xFF616161)),
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
                     ),
                   ),
-                  Icon(
+                  const Icon(
                     Icons.keyboard_arrow_down_rounded,
-                    color: Color(0xFF9E9E9E),
+                    color: AppColors.gray500,
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 32),
+            AppDims.vericalPadding_32,
             SizedBox(
               width: double.infinity,
               child: PrimaryButton(
@@ -142,12 +150,12 @@ class _DashedMediaUpload extends StatelessWidget {
         height: 180,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: const Color(0xFFF2FFF2), // Very light green
-          borderRadius: BorderRadius.circular(12),
+          color: AppColors.ci3, // Very light green
+          borderRadius: BorderRadius.circular(AppDims.size_12),
         ),
         child: CustomPaint(
           painter: _DashedBorderPainter(
-            color: const Color(0xFF9BD89E),
+            color: AppColors.ci2,
             strokeWidth: 1.5,
             gap: 4,
             dash: 8,
@@ -157,30 +165,29 @@ class _DashedMediaUpload extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SvgPicture.asset(
-                'assets/svg/ic_media-image.svg',
-                width: 40,
-                height: 40,
+                Assets.svg.icMediaImage,
+                width: AppDims.size_40,
+                height: AppDims.size_40,
                 colorFilter: const ColorFilter.mode(
-                  Color(0xFF15B34A),
+                  AppColors.primary,
                   BlendMode.srcIn,
                 ),
               ),
-              const SizedBox(height: 8),
+              AppDims.vericalPadding_8,
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppDims.size_16,
+                  vertical: AppDims.size_8,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFD8FDE8),
-                  borderRadius: BorderRadius.circular(8),
+                  color: AppColors.ci3,
+                  borderRadius: BorderRadius.circular(AppDims.size_8),
                 ),
-                child: const Text(
+                child: Text(
                   'ถ่ายรูปภาพหรือวิดีโอ',
-                  style: TextStyle(
-                    color: Color(0xFF15B34A),
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: AppColors.primary,
                     fontWeight: FontWeight.w700,
-                    fontSize: 13,
                   ),
                 ),
               ),

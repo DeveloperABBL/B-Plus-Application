@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:brownyplus/core/widgets/browny_background.dart';
+import 'package:brownyplus/res/colors/app_colors.dart';
+import 'package:brownyplus/res/icons/assets.gen.dart';
+import 'package:brownyplus/res/dims/app_dims.dart';
+import 'package:brownyplus/res/styles/app_text_styles.dart';
 
 class HomeShell extends StatefulWidget {
   final Widget body;
@@ -66,6 +72,7 @@ class _HomeShellState extends State<HomeShell>
     return Scaffold(
       body: Stack(
         children: [
+          const BrownyBackground(),
           widget.body,
           // Overlay dim
           if (_isMenuOpen)
@@ -73,7 +80,7 @@ class _HomeShellState extends State<HomeShell>
               onTap: _closeMenu,
               child: FadeTransition(
                 opacity: _fadeAnim,
-                child: Container(color: Colors.black.withValues(alpha: 0.45)),
+                child: Container(color: AppColors.overlay),
               ),
             ),
           // FAB Menu Items
@@ -87,62 +94,61 @@ class _HomeShellState extends State<HomeShell>
           turns: _isMenuOpen ? 0.125 : 0,
           duration: const Duration(milliseconds: 280),
           child: Container(
-            width: 65,
-            height: 65,
+            width: AppDims.size_65,
+            height: AppDims.size_65,
             decoration: const BoxDecoration(
               ///กรอบปุ่มกลาง
-              color: Color.fromARGB(255, 255, 255, 255),
+              color: AppColors.white,
               shape: BoxShape.circle,
             ),
             child: Padding(
-              padding: const EdgeInsets.all(5),
+              padding: EdgeInsets.all(AppDims.size_5),
               child: FloatingActionButton(
                 onPressed: _toggleMenu,
-                backgroundColor: const Color(0xFF15B34A),
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.white,
                 elevation: 4,
                 shape: const CircleBorder(),
-                child: const Icon(Icons.add, size: 34),
+                child: Icon(Icons.add, size: AppDims.size_33),
               ),
             ),
           ),
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
+        color: AppColors.white,
         elevation: 8,
-        shadowColor: Colors.black.withValues(alpha: 0.08),
+        shadowColor: AppColors.black.withValues(alpha: 0.08),
         padding: EdgeInsets.zero,
-        // shape: const CircularNotchedRectangle(),
         notchMargin: 8,
         child: SafeArea(
           top: false,
           child: SizedBox(
-            height: 60,
+            height: AppDims.size_60,
             child: Row(
               children: [
                 _NavItem(
                   label: 'หน้าหลัก',
-                  svgPath: 'assets/svg/ic_home.svg',
+                  svgPath: Assets.svg.icHome,
                   selected: widget.currentIndex == 0,
                   onTap: () {},
                 ),
                 _NavItem(
                   label: 'ร้าน',
-                  svgPath: 'assets/svg/ic_shop.svg',
+                  svgPath: Assets.svg.icShop,
                   selected: widget.currentIndex == 1,
                   onTap: () {},
                 ),
-                const SizedBox(width: 60),
+                SizedBox(width: AppDims.size_60),
                 _NavItem(
                   label: 'สแกน',
-                  svgPath: 'assets/svg/ic_scan.svg',
+                  svgPath: Assets.svg.icScan,
                   selected: widget.currentIndex == 2,
                   onTap: () {},
                 ),
                 _NavItem(
                   label: 'กระเป๋าเงิน',
-                  svgPath: 'assets/svg/ic_wallet.svg',
+                  svgPath: Assets.svg.icWallet,
                   selected: widget.currentIndex == 3,
                   onTap: () {},
                 ),
@@ -187,18 +193,18 @@ class _FabMenuOverlay extends StatelessWidget {
     final items = [
       _FabMenuItemData(
         label: 'แจ้งเรื่อง',
-        svgPath: 'assets/svg/ic_chat.svg',
-        iconColor: const Color(0xFF15B34A),
-        bgColor: Colors.white,
+        svgPath: Assets.svg.icChat,
+        iconColor: AppColors.primary,
+        bgColor: AppColors.white,
         radius: sideRadius,
         dx: centerX - sideHorizontal,
         dy: baseY - sideVertical,
       ),
       _FabMenuItemData(
         label: 'ชัก อบ พับ',
-        logoPath: 'assets/png/b+.png',
-        iconColor: const Color(0xFF15B34A),
-        bgColor: Colors.white,
+        logoPath: Assets.png.b.path,
+        iconColor: AppColors.primary,
+        bgColor: AppColors.white,
         radius: centerRadius,
         dx: centerX,
         dy: baseY - centerVertical,
@@ -206,9 +212,9 @@ class _FabMenuOverlay extends StatelessWidget {
       ),
       _FabMenuItemData(
         label: 'สต็อก',
-        svgPath: 'assets/svg/ic_box.svg',
-        iconColor: const Color(0xFF2EC065),
-        bgColor: Colors.white,
+        svgPath: Assets.svg.icBox,
+        iconColor: AppColors.primary,
+        bgColor: AppColors.white,
         radius: sideRadius,
         dx: centerX + sideHorizontal,
         dy: baseY - sideVertical,
@@ -221,7 +227,7 @@ class _FabMenuOverlay extends StatelessWidget {
         return Stack(
           children: items.map((item) {
             final totalW = item.radius * 2;
-            final labelOffset = 6.0;
+            const labelOffset = 6.0;
             return Positioned(
               left: item.dx - item.radius,
               top: item.dy - item.radius,
@@ -232,7 +238,16 @@ class _FabMenuOverlay extends StatelessWidget {
                   item: item,
                   totalW: totalW,
                   labelOffset: labelOffset,
-                  onTap: onItemTap,
+                  onTap: () {
+                    onItemTap();
+                    if (item.label == 'แจ้งเรื่อง') {
+                      context.push('/service_page?tab=report');
+                    } else if (item.label == 'ชัก อบ พับ') {
+                      context.push('/service_page?tab=wash');
+                    } else if (item.label == 'สต็อก') {
+                      context.push('/service_page?tab=stock');
+                    }
+                  },
                 ),
               ),
             );
@@ -301,7 +316,7 @@ class _FabMenuItemWidget extends StatelessWidget {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.18),
+              color: AppColors.black.withValues(alpha: 0.18),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -311,12 +326,11 @@ class _FabMenuItemWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildIcon(),
-            const SizedBox(height: 4),
+            AppDims.vericalPadding_4,
             Text(
               item.label,
-              style: TextStyle(
+              style: AppTextStyles.labelSmall.copyWith(
                 color: item.iconColor,
-                fontSize: 11,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -336,7 +350,7 @@ class _FabMenuItemWidget extends StatelessWidget {
         fit: BoxFit.contain,
         errorBuilder: (_, _, _) => Text(
           'B+',
-          style: TextStyle(
+          style: AppTextStyles.headlineLarge.copyWith(
             color: item.iconColor,
             fontWeight: FontWeight.w900,
             fontSize: 22,
@@ -377,26 +391,26 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? const Color(0xFF15B34A) : const Color(0xFF9E9E9E);
+    final color = selected ? AppColors.primary : AppColors.textSecondary;
 
     return Expanded(
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.only(top: 0),
+          padding: EdgeInsets.zero,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               SvgPicture.asset(
                 svgPath,
-                width: 28,
-                height: 28,
+                width: AppDims.size_28,
+                height: AppDims.size_28,
                 colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
               ),
-              const SizedBox(height: 2),
+              AppDims.vericalPadding_2,
               Text(
                 label,
-                style: TextStyle(
+                style: AppTextStyles.labelLarge.copyWith(
                   fontSize: 14,
                   color: color,
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w500,

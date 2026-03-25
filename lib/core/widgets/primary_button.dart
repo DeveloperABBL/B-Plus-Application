@@ -8,6 +8,7 @@ class PrimaryButton extends StatelessWidget {
   final String? iconPath;
   final Alignment alignment;
   final OutlinedBorder? shape;
+  final FontWeight? fontWeight;
 
   const PrimaryButton({
     super.key,
@@ -17,6 +18,7 @@ class PrimaryButton extends StatelessWidget {
     this.iconPath,
     this.alignment = Alignment.center,
     this.shape,
+    this.fontWeight,
   });
 
   @override
@@ -33,9 +35,9 @@ class PrimaryButton extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: fontWeight ?? FontWeight.w600,
                 ),
               ),
               if (iconPath != null) ...[

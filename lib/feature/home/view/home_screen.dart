@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:brownyplus/res/colors/app_colors.dart';
+import 'package:brownyplus/res/dims/app_dims.dart';
 
 import '../widgets/home_action_grid.dart';
 import '../widgets/home_app_bar.dart';
@@ -10,22 +12,30 @@ import '../widgets/home_shell.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+  static const pagePath = '/home_page';
+  static const pageName = 'HomePage';
+
   @override
   Widget build(BuildContext context) {
     return HomeShell(
       currentIndex: 0,
       body: Container(
-        color: const Color(0xFFF5F5F5),
+        color: AppColors.transparent,
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
               child: Container(
-                color: Colors.white,
-                child: const SafeArea(
+                color: AppColors.background,
+                child: SafeArea(
                   bottom: false,
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(16, 12, 16, 16),
-                    child: HomeAppBar(
+                    padding: EdgeInsets.fromLTRB(
+                      AppDims.size_16,
+                      AppDims.size_12,
+                      AppDims.size_16,
+                      AppDims.size_16,
+                    ),
+                    child: const HomeAppBar(
                       title: 'บราวนี่ บราวนี่',
                       subtitle: 'สาขาเทอร์มินอล 21 พระรามสาม',
                     ),
@@ -33,35 +43,35 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const SliverToBoxAdapter(child: SizedBox(height: 16)),
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(child: AppDims.vericalPadding_16),
+            SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: HomeBannerCarousel(),
+                padding: EdgeInsets.symmetric(horizontal: AppDims.size_16),
+                child: const HomeBannerCarousel(),
               ),
             ),
-            const SliverToBoxAdapter(child: SizedBox(height: 12)),
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(child: AppDims.vericalPadding_12),
+            SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: HomeCheckinCard(),
+                padding: EdgeInsets.symmetric(horizontal: AppDims.size_16),
+                child: const HomeCheckinCard(),
               ),
             ),
-            const SliverToBoxAdapter(child: SizedBox(height: 12)),
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(child: AppDims.vericalPadding_12),
+            SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: HomeServiceStatusSection(),
+                padding: EdgeInsets.symmetric(horizontal: AppDims.size_16),
+                child: const HomeServiceStatusSection(),
               ),
             ),
-            const SliverToBoxAdapter(child: SizedBox(height: 12)),
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(child: AppDims.vericalPadding_12),
+            SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: HomeActionGrid(),
+                padding: EdgeInsets.symmetric(horizontal: AppDims.size_16),
+                child: const HomeActionGrid(),
               ),
             ),
-            const SliverToBoxAdapter(child: SizedBox(height: 18)),
+            SliverToBoxAdapter(child: AppDims.vericalPadding_18),
           ],
         ),
       ),

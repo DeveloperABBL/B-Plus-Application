@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:brownyplus/res/colors/app_colors.dart';
+import 'package:brownyplus/res/icons/assets.gen.dart';
+import 'package:brownyplus/res/dims/app_dims.dart';
 
 class HomeBannerCarousel extends StatefulWidget {
   const HomeBannerCarousel({super.key});
@@ -51,8 +54,7 @@ class _HomeBannerCarouselState extends State<HomeBannerCarousel> {
               });
             },
             itemBuilder: (context, index) {
-              return Image.asset(
-                'assets/images/banner/Frame2087327902.png',
+              return Assets.images.banner.frame2087327902.image(
                 width: 140,
                 height: 140,
                 fit: BoxFit.contain,
@@ -60,20 +62,21 @@ class _HomeBannerCarouselState extends State<HomeBannerCarousel> {
             },
           ),
         ),
-        const SizedBox(height: 8),
+        AppDims.vericalPadding_8,
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(
             total,
             (i) => AnimatedContainer(
               duration: const Duration(milliseconds: 250),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              height: 6, // Slimmer indicators
-              width: i == _index ? 24 : 6,
+              margin: EdgeInsets.symmetric(horizontal: AppDims.size_4),
+              height: AppDims.size_6, // Slimmer indicators
+              width: i == _index ? AppDims.size_24 : AppDims.size_6,
               decoration: BoxDecoration(
-                color: i == _index
-                    ? const Color(0xFF15B34A)
-                    : const Color(0xFFD0D0D0), // More subtle grey
+                color:
+                    i == _index
+                        ? AppColors.primary
+                        : AppColors.border, // More subtle grey
                 borderRadius: BorderRadius.circular(999),
               ),
             ),

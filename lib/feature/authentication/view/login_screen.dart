@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:brownyplus/core/widgets/browny_logo.dart';
-import 'package:brownyplus/core/widgets/primary_button.dart';
-import 'package:brownyplus/core/widgets/rounded_text_field.dart';
-import 'package:brownyplus/feature/home/view/home_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:brownyplus/res/colors/app_colors.dart';
+import 'package:brownyplus/res/icons/assets.gen.dart';
+import 'package:brownyplus/res/dims/app_dims.dart';
+import 'package:brownyplus/res/styles/app_text_styles.dart';
+import 'package:brownyplus/feature/authentication/view/forgot_password_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  static const pagePath = '/login_page';
+  static const pageName = 'LoginPage';
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  bool _isObscure = true;
 
   @override
   Widget build(BuildContext context) {
@@ -14,21 +27,26 @@ class LoginScreen extends StatelessWidget {
       backgroundColor: const Color(0xFF28C161),
       body: Stack(
         children: [
-          Row(
-            children: [
-              SizedBox(width: 25),
-              SizedBox(height: 170),
-              SvgPicture.asset('assets/svg/ic_back.svg', width: 20, height: 20),
-              const SizedBox(width: 15),
-              const Text(
-                'ย้อนกลับ',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
+          _buildGradientBackground(),
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            behavior: HitTestBehavior.opaque,
+            child: Row(
+              children: [
+                const SizedBox(width: 25),
+                const SizedBox(height: 170),
+                SvgPicture.asset(Assets.svg.icBack),
+                const SizedBox(width: 15),
+                const Text(
+                  'ย้อนกลับ',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           // โลโก้ด้านบน
           SafeArea(
@@ -36,7 +54,7 @@ class LoginScreen extends StatelessWidget {
               alignment: Alignment.topCenter,
               child: Padding(
                 padding: const EdgeInsets.only(top: 80),
-                child: const BrownyLogo(),
+                child: Assets.images.brownyPlusLogo.image(),
               ),
             ),
           ),
@@ -55,57 +73,38 @@ class LoginScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 8),
-                  const Text(
+                  AppDims.vericalPadding_4,
+                  Text(
                     "เข้าสู่บัญชีของคุณ",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF593817),
-                    ),
+                    style: AppTextStyles.titleLarge.copyWith(fontSize: 24.sp),
                   ),
-                  const SizedBox(height: 6),
-                  const Text(
+                  AppDims.vericalPadding_4,
+                  Text(
                     "กรุณาเข้าสู่ระบบ ด้วยบัญชีที่ได้รับอนุญาต",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF593817),
+                    style: AppTextStyles.labelSmallSlim.copyWith(
+                      color: const Color(0xFF616161),
+                      fontSize: 14.sp,
                     ),
                   ),
                   const SizedBox(height: 30),
-                  const RoundedTextField(
-                    hintText: 'อีเมล / เบอร์โทรศัพท์',
-                    keyboardType: TextInputType.emailAddress,
-                  ),
+                  textFormFieldEmailOrPhone(),
                   const SizedBox(height: 16),
-
-                  const RoundedTextField(
-                    hintText: 'รหัสผ่าน',
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 100),
-
-                  PrimaryButton(
-                    label: 'เข้าสู่ระบบ',
-                    iconPath: 'assets/svg/ic_login.svg',
-                    onPressed: () {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute<void>(
-                          builder: (_) => const HomeScreen(),
-                        ),
-                      );
-                    },
-                  ),
+                  textFormFieldPassword(),
+                  SizedBox(height: 100),
+                  buildPrimaryButton(),
                   const SizedBox(height: 8),
                   Align(
                     alignment: Alignment.center,
                     child: TextButton(
-                      onPressed: () {},
-                      child: const Text(
+                      onPressed: () {
+                        context.pushNamed(ForgotPasswordScreen.pageName);
+                      },
+                      child: Text(
                         'ลืมรหัสผ่าน',
-                        style: TextStyle(
-                          color: Color(0xFF15B34A),
-                          fontWeight: FontWeight.w500,
+                        style: AppTextStyles.labelSmallSlim.copyWith(
+                          color: const Color(0xFF15B34A),
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -115,6 +114,121 @@ class LoginScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildGradientBackground() {
+    return Container(
+      decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
+      child: Opacity(
+        opacity: 0.07,
+        child: Assets.png.patternBrowny.image(
+          width: 1.sw,
+          height: 0.7.sh,
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+
+  @protected
+  Widget textFormFieldEmailOrPhone() {
+    return SizedBox(
+      width: double.infinity,
+      child: TextField(
+        decoration: InputDecoration(
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 12,
+            horizontal: 16,
+          ),
+          hintText: 'อีเมล / เบอร์โทรศัพท์',
+          hintStyle: AppTextStyles.labelSmallSlim.copyWith(
+            color: const Color(0xFF949494),
+            fontSize: 12.sp,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Color(0xFF949494)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Color(0xFF949494)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Color(0xFF949494)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @protected
+  Widget textFormFieldPassword() {
+    return SizedBox(
+      width: double.infinity,
+      child: TextField(
+        obscureText: _isObscure,
+        decoration: InputDecoration(
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 12,
+            horizontal: 16,
+          ),
+          hintText: 'รหัสผ่าน',
+          hintStyle: AppTextStyles.labelSmallSlim.copyWith(
+            color: const Color(0xFF949494),
+            fontSize: 12.sp,
+          ),
+          suffixIcon: IconButton(
+            icon: SvgPicture.asset(
+              _isObscure ? Assets.svg.icEyeSlash : Assets.svg.icEye,
+              colorFilter: const ColorFilter.mode(
+                Color(0xFF949494),
+                BlendMode.srcIn,
+              ),
+            ),
+            onPressed: () {
+              setState(() {
+                _isObscure = !_isObscure;
+              });
+            },
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFF949494)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFF949494)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFF949494)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildPrimaryButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: AppElevatedButtonStyle.defaultStyle,
+        onPressed: () {
+          context.push('/pin_page');
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('เข้าสู่ระบบ'),
+            const SizedBox(width: 8),
+            SvgPicture.asset(Assets.svg.icLogin),
+          ],
+        ),
       ),
     );
   }

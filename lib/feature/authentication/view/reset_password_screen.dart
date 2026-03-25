@@ -1,0 +1,251 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:brownyplus/res/colors/app_colors.dart';
+import 'package:brownyplus/res/icons/assets.gen.dart';
+import 'package:brownyplus/res/styles/app_text_styles.dart';
+
+class ResetPasswordScreen extends StatefulWidget {
+  const ResetPasswordScreen({super.key});
+
+  static const pagePath = '/reset_password_page';
+  static const pageName = 'ResetPasswordPage';
+
+  @override
+  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+}
+
+class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  bool _isPasswordObscure = true;
+  bool _isConfirmPasswordObscure = true;
+
+  bool _isMinLength = false;
+  bool _isMatch = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _passwordController.addListener(_validate);
+    _confirmPasswordController.addListener(_validate);
+  }
+
+  void _validate() {
+    setState(() {
+      _isMinLength = _passwordController.text.length >= 8;
+      _isMatch = _passwordController.text.isNotEmpty &&
+          _passwordController.text == _confirmPasswordController.text;
+    });
+  }
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF28C161),
+      body: Stack(
+        children: [
+          _buildGradientBackground(),
+          _buildBackButton(context),
+          _buildLogo(),
+          _buildCard(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGradientBackground() {
+    return Container(
+      decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
+      child: Opacity(
+        opacity: 0.07,
+        child: Assets.png.patternBrowny.image(
+          width: 1.sw,
+          height: 0.7.sh,
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBackButton(BuildContext context) {
+    return SafeArea(
+      child: GestureDetector(
+        onTap: () => context.pop(),
+        behavior: HitTestBehavior.opaque,
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 20.h),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SvgPicture.asset(Assets.svg.icBack),
+              SizedBox(width: 15.w),
+              Text(
+                'ย้อนกลับ',
+                style: AppTextStyles.labelLarge.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogo() {
+    return SafeArea(
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Padding(
+          padding: EdgeInsets.only(top: 80.h),
+          child: Assets.images.brownyPlusLogo.image(width: 120.w, height: 120.w),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCard(BuildContext context) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32.r)),
+        ),
+        padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 40.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 8.h),
+            Text(
+              "กำหนดรหัสผ่านใหม่",
+              style: AppTextStyles.titleLarge.copyWith(
+                fontSize: 24.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              "แค่ตั้งรหัสผ่านใหม่ก็พร้อมไปต่อ! มาเริ่มกันเลย",
+              style: AppTextStyles.labelSmallSlim.copyWith(
+                color: const Color(0xFF616161),
+                fontSize: 14.sp,
+              ),
+            ),
+            SizedBox(height: 30.h),
+            _buildPasswordField(
+              controller: _passwordController,
+              hintText: 'สร้างรหัสผ่านใหม่',
+              isObscure: _isPasswordObscure,
+              onToggle: () => setState(() => _isPasswordObscure = !_isPasswordObscure),
+            ),
+            SizedBox(height: 16.h),
+            _buildPasswordField(
+              controller: _confirmPasswordController,
+              hintText: 'ยืนยันรหัสผ่านใหม่',
+              isObscure: _isConfirmPasswordObscure,
+              onToggle: () => setState(() => _isConfirmPasswordObscure = !_isConfirmPasswordObscure),
+            ),
+            SizedBox(height: 16.h),
+            _buildValidationItem("รหัสผ่านใหม่ตรงกัน", _isMatch),
+            SizedBox(height: 8.h),
+            _buildValidationItem("8 ตัวอักษรขึ้นไป", _isMinLength),
+            SizedBox(height: 32.h),
+            _buildConfirmButton(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+    required String hintText,
+    required bool isObscure,
+    required VoidCallback onToggle,
+  }) {
+    return TextField(
+      controller: controller,
+      obscureText: isObscure,
+      decoration: InputDecoration(
+        isDense: true,
+        contentPadding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
+        hintText: hintText,
+        hintStyle: AppTextStyles.labelSmallSlim.copyWith(
+          color: const Color(0xFF949494),
+          fontSize: 14.sp,
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            isObscure ? Icons.visibility_off : Icons.visibility,
+            color: const Color(0xFF949494),
+            size: 20.w,
+          ),
+          onPressed: onToggle,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: const BorderSide(color: Color(0xFF15B34A)),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildValidationItem(String text, bool isValid) {
+    return Row(
+      children: [
+        Icon(
+          isValid ? Icons.check_circle : Icons.cancel,
+          color: isValid ? const Color(0xFF15B34A) : const Color(0xFFE53935),
+          size: 16.w,
+        ),
+        SizedBox(width: 8.w),
+        Text(
+          text,
+          style: AppTextStyles.labelSmallSlim.copyWith(
+            color: isValid ? const Color(0xFF15B34A) : const Color(0xFFE53935),
+            fontSize: 12.sp,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildConfirmButton(BuildContext context) {
+    bool canConfirm = _isMatch && _isMinLength;
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: AppElevatedButtonStyle.defaultStyle.copyWith(
+          backgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (canConfirm) return const Color(0xFF15B34A);
+            return const Color(0xFFE0E0E0);
+          }),
+        ),
+        onPressed: canConfirm
+            ? () {
+                // Return to login or show success
+                context.go('/login_page');
+              }
+            : null,
+        child: const Text('ยืนยันรหัสผ่าน'),
+      ),
+    );
+  }
+}
