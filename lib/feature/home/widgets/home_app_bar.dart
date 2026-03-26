@@ -26,9 +26,8 @@ class HomeAppBar extends StatelessWidget {
           child: ClipOval(
             child: Assets.images.banner.frame2087327902.image(
               fit: BoxFit.cover,
-              errorBuilder:
-                  (_, _, _) =>
-                      Icon(Icons.person_rounded, color: AppColors.primary),
+              errorBuilder: (_, _, _) =>
+                  Icon(Icons.person_rounded, color: AppColors.primary),
             ),
           ),
         ),

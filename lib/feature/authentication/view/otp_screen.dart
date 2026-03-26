@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:brownyplus/res/colors/app_colors.dart';
 import 'package:brownyplus/res/icons/assets.gen.dart';
 import 'package:brownyplus/res/styles/app_text_styles.dart';
 import 'package:brownyplus/feature/authentication/view/reset_password_screen.dart';
+import 'package:brownyplus/core/widgets/top_back_button.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({super.key});
@@ -28,6 +27,8 @@ class _OtpScreenState extends State<OtpScreen> {
 
   int _secondsRemaining = 60;
   Timer? _timer;
+  bool _hasError = false;
+  static const String _correctOtp = "1234";
 
   @override
   void initState() {
@@ -66,7 +67,7 @@ class _OtpScreenState extends State<OtpScreen> {
       body: Stack(
         children: [
           _buildGradientBackground(),
-          _buildBackButton(context),
+          const TopBackButton(),
           _buildLogo(),
           _buildCard(context),
         ],
@@ -88,31 +89,6 @@ class _OtpScreenState extends State<OtpScreen> {
     );
   }
 
-  Widget _buildBackButton(BuildContext context) {
-    return SafeArea(
-      child: GestureDetector(
-        onTap: () => context.pop(),
-        behavior: HitTestBehavior.opaque,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 20.h),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SvgPicture.asset(Assets.svg.icBack),
-              SizedBox(width: 10.w),
-              Text(
-                'ย้อนกลับ',
-                style: AppTextStyles.labelLarge.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildLogo() {
     return SafeArea(
@@ -179,6 +155,17 @@ class _OtpScreenState extends State<OtpScreen> {
             ),
             SizedBox(height: 8.h),
             _buildResendCode(),
+            if (_secondsRemaining == 0 || _hasError) ...[
+              SizedBox(height: 8.h),
+              Text(
+                "รหัส OTP ไม่ถูกต้อง กรุณาขอรหัสใหม่",
+                style: AppTextStyles.labelSmallSlim.copyWith(
+                  color: const Color(0xFFE53935),
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
             SizedBox(height: 190.h),
           ],
         ),
@@ -208,11 +195,19 @@ class _OtpScreenState extends State<OtpScreen> {
               counterText: "",
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8.r),
-                borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                borderSide: BorderSide(
+                  color: (_hasError || _secondsRemaining == 0)
+                      ? const Color(0xFFE53935)
+                      : const Color(0xFFE0E0E0),
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8.r),
-                borderSide: const BorderSide(color: Color(0xFF15B34A)),
+                borderSide: BorderSide(
+                  color: (_hasError || _secondsRemaining == 0)
+                      ? const Color(0xFFE53935)
+                      : const Color(0xFF15B34A),
+                ),
               ),
             ),
             onChanged: (value) {
@@ -241,7 +236,13 @@ class _OtpScreenState extends State<OtpScreen> {
         ),
         onPressed: isComplete
             ? () {
-                context.pushNamed(ResetPasswordScreen.pageName);
+                String enteredOtp = _controllers.map((c) => c.text).join();
+                if (enteredOtp == _correctOtp) {
+                  setState(() => _hasError = false);
+                  context.pushNamed(ResetPasswordScreen.pageName);
+                } else {
+                  setState(() => _hasError = true);
+                }
               }
             : null,
         child: const Text('ถัดไป'),
@@ -264,6 +265,7 @@ class _OtpScreenState extends State<OtpScreen> {
         onPressed: () {
           setState(() {
             _secondsRemaining = 60;
+            _hasError = false;
             _startTimer();
           });
         },

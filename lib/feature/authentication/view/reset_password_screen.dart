@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:brownyplus/res/colors/app_colors.dart';
 import 'package:brownyplus/res/icons/assets.gen.dart';
 import 'package:brownyplus/res/styles/app_text_styles.dart';
+import 'package:brownyplus/core/widgets/top_back_button.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -35,7 +35,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   void _validate() {
     setState(() {
       _isMinLength = _passwordController.text.length >= 8;
-      _isMatch = _passwordController.text.isNotEmpty &&
+      _isMatch =
+          _passwordController.text.isNotEmpty &&
           _passwordController.text == _confirmPasswordController.text;
     });
   }
@@ -54,7 +55,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       body: Stack(
         children: [
           _buildGradientBackground(),
-          _buildBackButton(context),
+          const TopBackButton(),
           _buildLogo(),
           _buildCard(context),
         ],
@@ -76,39 +77,16 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     );
   }
 
-  Widget _buildBackButton(BuildContext context) {
-    return SafeArea(
-      child: GestureDetector(
-        onTap: () => context.pop(),
-        behavior: HitTestBehavior.opaque,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 25.w, vertical: 20.h),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SvgPicture.asset(Assets.svg.icBack),
-              SizedBox(width: 15.w),
-              Text(
-                'ย้อนกลับ',
-                style: AppTextStyles.labelLarge.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildLogo() {
     return SafeArea(
       child: Align(
         alignment: Alignment.topCenter,
         child: Padding(
           padding: EdgeInsets.only(top: 80.h),
-          child: Assets.images.brownyPlusLogo.image(width: 120.w, height: 120.w),
+          child: Assets.images.brownyPlusLogo.image(
+            width: 120.w,
+            height: 120.w,
+          ),
         ),
       ),
     );
@@ -149,14 +127,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               controller: _passwordController,
               hintText: 'สร้างรหัสผ่านใหม่',
               isObscure: _isPasswordObscure,
-              onToggle: () => setState(() => _isPasswordObscure = !_isPasswordObscure),
+              onToggle: () =>
+                  setState(() => _isPasswordObscure = !_isPasswordObscure),
             ),
             SizedBox(height: 16.h),
             _buildPasswordField(
               controller: _confirmPasswordController,
               hintText: 'ยืนยันรหัสผ่านใหม่',
               isObscure: _isConfirmPasswordObscure,
-              onToggle: () => setState(() => _isConfirmPasswordObscure = !_isConfirmPasswordObscure),
+              onToggle: () => setState(
+                () => _isConfirmPasswordObscure = !_isConfirmPasswordObscure,
+              ),
             ),
             SizedBox(height: 16.h),
             _buildValidationItem("รหัสผ่านใหม่ตรงกัน", _isMatch),

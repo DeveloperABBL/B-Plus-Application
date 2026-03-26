@@ -7,6 +7,7 @@ import 'package:brownyplus/res/icons/assets.gen.dart';
 import 'package:brownyplus/res/dims/app_dims.dart';
 import 'package:brownyplus/res/styles/app_text_styles.dart';
 import 'package:brownyplus/feature/authentication/view/forgot_password_screen.dart';
+import 'package:brownyplus/core/widgets/top_back_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -28,36 +29,9 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Stack(
         children: [
           _buildGradientBackground(),
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            behavior: HitTestBehavior.opaque,
-            child: Row(
-              children: [
-                const SizedBox(width: 25),
-                const SizedBox(height: 170),
-                SvgPicture.asset(Assets.svg.icBack),
-                const SizedBox(width: 15),
-                const Text(
-                  'ย้อนกลับ',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          const TopBackButton(),
           // โลโก้ด้านบน
-          SafeArea(
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 80),
-                child: Assets.images.brownyPlusLogo.image(),
-              ),
-            ),
-          ),
+          _buildLogo(context),
           // การ์ดส่วนล่าง
           Align(
             alignment: Alignment.bottomCenter,
@@ -118,6 +92,19 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Widget _buildLogo(BuildContext context) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(height: 100.h),
+          Assets.images.brownyPlusLogo.image(width: 200.w, height: 200.w),
+        ],
+      ),
+    );
+  }
+
   Widget _buildGradientBackground() {
     return Container(
       decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
@@ -131,6 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
 
   @protected
   Widget textFormFieldEmailOrPhone() {

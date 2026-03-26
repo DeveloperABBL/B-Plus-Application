@@ -180,6 +180,9 @@ class AppColors {
   /// สีข้อความหลัก (น้ำตาลเข้ม)
   static const Color textPrimary = Color(0xFF593817); // #593817 (Dark Brown)
 
+  /// สีข้อความหลัก (เขียว)
+  static const Color textPrimaryGreen = Color(0xFF2FBA38); // #2FBA38 (Dark Brown)
+
   /// สีข้อความรอง (เทา)
   static const Color textSecondary = Color(0xFF777777); // #777777
 

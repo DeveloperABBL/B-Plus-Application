@@ -44,8 +44,11 @@ class $AssetsPngGen {
   /// File path: assets/png/b+.png
   AssetGenImage get b => const AssetGenImage('assets/png/b+.png');
 
+  /// File path: assets/png/set_pin.png
+  AssetGenImage get setPin => const AssetGenImage('assets/png/set_pin.png');
+
   /// List of all assets
-  List<AssetGenImage> get values => [patternBrowny, b];
+  List<AssetGenImage> get values => [patternBrowny, b, setPin];
 }
 
 class $AssetsSvgGen {
@@ -110,6 +113,9 @@ class $AssetsSvgGen {
 
   /// File path: assets/svg/ic_checked.svg
   String get icChecked => 'assets/svg/ic_checked.svg';
+
+  /// File path: assets/svg/ic_backspace.svg
+  String get icBackspace => 'assets/svg/ic_backspace.svg';
 
   /// List of all assets
   List<String> get values => [

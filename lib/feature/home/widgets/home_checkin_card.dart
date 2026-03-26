@@ -16,7 +16,7 @@ class HomeCheckinCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.ci3,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(AppDims.size_8),
         border: Border.all(color: AppColors.ci2),
         boxShadow: [

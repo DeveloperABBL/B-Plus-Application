@@ -1,11 +1,11 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:brownyplus/core/widgets/primary_button.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:brownyplus/res/colors/app_colors.dart';
 import 'package:brownyplus/res/icons/assets.gen.dart';
 import 'package:brownyplus/res/dims/app_dims.dart';
 import 'package:brownyplus/res/styles/app_text_styles.dart';
+import 'package:brownyplus/core/widgets/primary_button.dart';
 
 class HomeCheckinPopup extends StatelessWidget {
   const HomeCheckinPopup({super.key});

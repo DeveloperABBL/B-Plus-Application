@@ -3,6 +3,7 @@ import 'package:brownyplus/res/colors/app_colors.dart';
 import 'package:brownyplus/res/styles/app_text_styles.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:go_router/go_router.dart';
+import 'package:brownyplus/core/widgets/top_back_button.dart';
 
 class BiometricScreen extends StatefulWidget {
   const BiometricScreen({super.key});
@@ -41,25 +42,12 @@ class _BiometricScreenState extends State<BiometricScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: AppColors.primary,
-          ),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
-          'ย้อนกลับ',
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary),
-        ),
-        titleSpacing: 0,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
+      body: Stack(
+        children: [
+          const TopBackButton(color: AppColors.primary),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
           children: [
             const Spacer(),
             Row(
@@ -121,9 +109,11 @@ class _BiometricScreenState extends State<BiometricScreen> {
               ),
             ),
             const SizedBox(height: 40),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      ],
+    ),
+  );
+}
 }

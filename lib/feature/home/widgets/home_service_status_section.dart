@@ -59,9 +59,9 @@ class HomeServiceStatusSection extends StatelessWidget {
                 children: [
                   Text(
                     'แสดงเพิ่มเติม',
-                    style: AppTextStyles.labelLarge.copyWith(
-                      fontWeight: FontWeight.w600,
+                    style: AppTextStyles.labelSmall.copyWith(
                       fontSize: 16,
+                      color: AppColors.primary,
                     ),
                   ),
                   const Icon(Icons.keyboard_arrow_down_rounded, size: 16),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:brownyplus/core/widgets/browny_background.dart';
 import 'package:brownyplus/res/colors/app_colors.dart';
 import 'package:brownyplus/res/icons/assets.gen.dart';
 import 'package:brownyplus/res/dims/app_dims.dart';
@@ -70,9 +69,9 @@ class _HomeShellState extends State<HomeShell>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.bareBackground,
       body: Stack(
         children: [
-          const BrownyBackground(),
           widget.body,
           // Overlay dim
           if (_isMenuOpen)

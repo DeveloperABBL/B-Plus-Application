@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:brownyplus/res/colors/app_colors.dart';
 import 'package:brownyplus/res/styles/app_text_styles.dart';
 import 'package:brownyplus/res/icons/assets.gen.dart';
+import 'package:brownyplus/core/widgets/top_back_button.dart';
 import 'package:go_router/go_router.dart';
 
 class PinScreen extends StatefulWidget {
@@ -45,68 +47,58 @@ class _PinScreenState extends State<PinScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: AppBar(
-        backgroundColor: AppColors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: AppColors.primary,
-          ),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
-          'ย้อนกลับ',
-          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary),
-        ),
-        titleSpacing: 0,
-      ),
-      body: Column(
+      body: Stack(
         children: [
-          const SizedBox(height: 20),
-          Center(
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
-                shape: BoxShape.circle,
-              ),
-              child: ClipOval(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Assets.png.b.image(),
+          const TopBackButton(color: Color(0xFF2FBA38)),
+          Column(
+            children: [
+              const SizedBox(
+                height: 120,
+              ), // Compensation for moving TopBackButton out
+              Center(
+                child: Container(
+                  width: 90,
+                  height: 90,
+                  decoration: const BoxDecoration(
+                    color: AppColors.primary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: ClipOval(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Assets.png.setPin.image(),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'สร้างรหัส PIN 6 หลัก',
-            style: AppTextStyles.bodyLarge.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 32),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(6, (index) {
-              bool isFilled = index < _pin.length;
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 10),
-                width: 16,
-                height: 16,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isFilled ? AppColors.primary : AppColors.white,
-                  border: Border.all(color: AppColors.primary, width: 2),
+              const SizedBox(height: 24),
+              Text(
+                'สร้างรหัส PIN 6 หลัก',
+                style: AppTextStyles.bodyLarge.copyWith(
+                  fontWeight: FontWeight.w700,
                 ),
-              );
-            }),
+              ),
+              const SizedBox(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(6, (index) {
+                  bool isFilled = index < _pin.length;
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 13),
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isFilled ? AppColors.primary : AppColors.white,
+                      border: Border.all(color: AppColors.primary, width: 2),
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(height: 32),
+              _buildKeypad(),
+            ],
           ),
-          const Spacer(),
-          _buildKeypad(),
-          const SizedBox(height: 40),
         ],
       ),
     );
@@ -114,31 +106,21 @@ class _PinScreenState extends State<PinScreen> {
 
   Widget _buildKeypad() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
+      padding: const EdgeInsets.symmetric(horizontal: 50),
       child: Column(
         children: [
           _buildKeyRow(['1', '2', '3']),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           _buildKeyRow(['4', '5', '6']),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           _buildKeyRow(['7', '8', '9']),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(width: 60),
+              const SizedBox(width: 80),
               _buildKeyButton('0'),
-              SizedBox(
-                width: 60,
-                child: IconButton(
-                  onPressed: _onBackspace,
-                  icon: const Icon(
-                    Icons.backspace_outlined,
-                    color: AppColors.textPrimary,
-                    size: 28,
-                  ),
-                ),
-              ),
+              _BackspaceButton(onPressed: _onBackspace),
             ],
           ),
         ],
@@ -154,19 +136,88 @@ class _PinScreenState extends State<PinScreen> {
   }
 
   Widget _buildKeyButton(String key) {
-    return InkWell(
-      onTap: () => _onKeyTap(key),
-      borderRadius: BorderRadius.circular(40),
+    return _PinKeyButton(text: key, onTap: _onKeyTap);
+  }
+}
+
+class _PinKeyButton extends StatefulWidget {
+  final String text;
+  final Function(String) onTap;
+
+  const _PinKeyButton({required this.text, required this.onTap});
+
+  @override
+  State<_PinKeyButton> createState() => _PinKeyButtonState();
+}
+
+class _PinKeyButtonState extends State<_PinKeyButton> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        widget.onTap(widget.text);
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
       child: Container(
-        width: 60,
-        height: 60,
+        width: 75,
+        height: 75,
+        decoration: BoxDecoration(
+          color: _isPressed ? AppColors.primary : Colors.transparent,
+          shape: BoxShape.circle,
+        ),
         alignment: Alignment.center,
         child: Text(
-          key,
+          widget.text,
           style: AppTextStyles.headlineSmall.copyWith(
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: _isPressed ? AppColors.white : AppColors.textPrimary,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BackspaceButton extends StatefulWidget {
+  final VoidCallback onPressed;
+
+  const _BackspaceButton({required this.onPressed});
+
+  @override
+  State<_BackspaceButton> createState() => _BackspaceButtonState();
+}
+
+class _BackspaceButtonState extends State<_BackspaceButton> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        widget.onPressed();
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: Container(
+        width: 75,
+        height: 75,
+        decoration: BoxDecoration(
+          color: _isPressed ? AppColors.primary : Colors.transparent,
+          shape: BoxShape.circle,
+        ),
+        alignment: Alignment.center,
+        child: SvgPicture.asset(
+          Assets.svg.icBackspace,
+          colorFilter: ColorFilter.mode(
+            _isPressed ? AppColors.white : AppColors.textPrimary,
+            BlendMode.srcIn,
+          ),
+          width: 28,
+          height: 28,
         ),
       ),
     );
