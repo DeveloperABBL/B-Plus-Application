@@ -8,6 +8,7 @@ import 'package:brownyplus/feature/authentication/view/otp_screen.dart';
 import 'package:brownyplus/feature/authentication/view/reset_password_screen.dart';
 import 'package:brownyplus/feature/home/view/home_screen.dart';
 import 'package:brownyplus/feature/service/view/service_screen.dart';
+import 'package:brownyplus/feature/scaner/view/scanner_screen.dart';
 
 // import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -71,6 +72,11 @@ class AppRouter {
           final tab = state.uri.queryParameters['tab'] ?? 'management';
           return ServiceScreen(initialTab: tab);
         },
+      ),
+      GoRoute(
+        path: ScannerScreen.pagePath,
+        name: ScannerScreen.pageName,
+        builder: (context, state) => const ScannerScreen(),
       ),
     ],
   );

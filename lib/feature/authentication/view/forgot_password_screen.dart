@@ -6,6 +6,8 @@ import 'package:brownyplus/res/icons/assets.gen.dart';
 import 'package:brownyplus/res/styles/app_text_styles.dart';
 import 'package:brownyplus/feature/authentication/view/otp_screen.dart';
 import 'package:brownyplus/core/widgets/top_back_button.dart';
+import 'package:brownyplus/core/widgets/keyboard_dismissible.dart';
+import 'package:brownyplus/core/providers/customer_provider.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -30,13 +32,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF28C161),
-      body: Stack(
-        children: [
-          _buildGradientBackground(),
-          const TopBackButton(),
-          _buildLogo(),
-          _buildCard(context),
-        ],
+      resizeToAvoidBottomInset: false,
+      body: KeyboardDismissible(
+        child: Stack(
+          children: [
+            _buildGradientBackground(),
+            const TopBackButton(),
+            _buildLogo(),
+            _buildCard(context),
+          ],
+        ),
       ),
     );
   }
@@ -54,7 +59,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       ),
     );
   }
-
 
   Widget _buildLogo() {
     return SafeArea(
@@ -80,33 +84,40 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(32.r)),
         ),
-        padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 40.h),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 8.h),
-            Text(
-              "ลืมรหัสผ่าน",
-              style: AppTextStyles.titleLarge.copyWith(
-                fontSize: 24.sp,
-                fontWeight: FontWeight.bold,
+        padding: EdgeInsets.fromLTRB(
+          24.w,
+          24.h,
+          24.w,
+          MediaQuery.of(context).viewInsets.bottom + 40.h,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 8.h),
+              Text(
+                "ลืมรหัสผ่าน",
+                style: AppTextStyles.titleLarge.copyWith(
+                  fontSize: 24.sp,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            SizedBox(height: 4.h),
-            Text(
-              "กรุณากรอกเบอร์โทรศัพท์ที่ลงทะเบียนไว้",
-              style: AppTextStyles.labelSmallSlim.copyWith(
-                color: const Color(0xFF616161),
-                fontSize: 14.sp,
+              SizedBox(height: 4.h),
+              Text(
+                "กรุณากรอกเบอร์โทรศัพท์ที่ลงทะเบียนไว้",
+                style: AppTextStyles.labelSmallSlim.copyWith(
+                  color: const Color(0xFF616161),
+                  fontSize: 14.sp,
+                ),
               ),
-            ),
-            SizedBox(height: 20.h),
-            _buildPhoneField(),
-            SizedBox(height: 20.h),
-            _buildNextButton(context),
-            SizedBox(height: 260.h),
-          ],
+              SizedBox(height: 20.h),
+              _buildPhoneField(),
+              SizedBox(height: 20.h),
+              _buildNextButton(context),
+              SizedBox(height: 30.h),
+            ],
+          ),
         ),
       ),
     );
@@ -142,6 +153,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       child: ElevatedButton(
         style: AppElevatedButtonStyle.defaultStyle,
         onPressed: () {
+          final username = _phoneController.text.trim();
+          if (username.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('กรุณากรอกเบอร์โทร/อีเมล')),
+            );
+            return;
+          }
+          AuthSession.otpUsername = username;
           context.pushNamed(OtpScreen.pageName);
         },
         child: const Text('ถัดไป'),

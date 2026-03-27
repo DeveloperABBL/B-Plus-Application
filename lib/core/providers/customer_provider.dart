@@ -65,3 +65,26 @@
 //     );
 //   }
 // }
+
+/// Minimal auth state for BrownyPlus.
+///
+/// NOTE: นี่เป็นตัวแปรสำหรับแชร์ข้อมูลระหว่างหน้า auth (login -> otp -> pin -> reset)
+/// เพื่อทดสอบการทำงาน ก่อนจะย้ายไปยัง state management ที่สมบูรณ์ขึ้น
+class AuthSession {
+  /// Customer id ที่ได้จาก `login` หรือ `verify-otp`
+  static String? customerId;
+
+  /// username (email/phone) ที่ใช้ขอ OTP
+  static String? otpUsername;
+
+  /// ref_code ที่ได้จาก `request-otp`
+  static String? otpRefCode;
+
+  static void clear() {
+    customerId = null;
+    otpUsername = null;
+    otpRefCode = null;
+  }
+
+  static bool get hasCustomerId => (customerId ?? '').isNotEmpty;
+}

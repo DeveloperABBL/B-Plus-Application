@@ -215,7 +215,7 @@ class AppElevatedButtonStyle {
   static ButtonStyle defaultStyle =
       ElevatedButton.styleFrom(
         // maximumSize: Size(double.infinity, AppDims.size_40.h),
-        minimumSize: Size(double.infinity, AppDims.size_42.h),
+        minimumSize: Size(double.infinity, AppDims.size_40.h),
         backgroundColor: AppColors.ctaPrimaryDefault,
         foregroundColor: AppColors.white,
         disabledBackgroundColor: AppColors.ctaPrimaryDisable,

@@ -5,26 +5,37 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'dart:ui';
 
+import 'package:brownyplus/core/env/dev_environment.dart';
+import 'package:brownyplus/core/widgets/app_router.dart';
+import 'package:brownyplus/feature/authentication/view/on_boarding_screen.dart';
 import 'package:brownyplus/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('BrownyPlus loads initial route', (WidgetTester tester) async {
+    // In widget tests the default viewport can be too small which causes
+    // RenderFlex overflow on onboarding layout. Set a "phone-like" size.
+    tester.binding.window.physicalSizeTestValue = const Size(1080, 1920);
+    tester.binding.window.devicePixelRatioTestValue = 3.0;
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    final appEnvironment = DevEnvironment(
+      appRouter: AppRouter(
+        initialLocation: OnBoardingScreen.pagePath,
+      ),
+    );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // loadEnv reads `env/dev.json` for baseUrl/token used by AppClient.
+    await appEnvironment.loadEnv();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    await tester.pumpWidget(MyApp(appEnvironment: appEnvironment));
+    await tester.pumpAndSettle();
+
+    // Verify that OnBoardingScreen is rendered.
+    expect(
+      find.text('พื้นที่สำหรับทีมงาน Browny เท่านั้น'),
+      findsOneWidget,
+    );
   });
 }

@@ -1,17 +1,34 @@
-// import 'package:brownyplus/core/env/dev_environment.dart';
-// import 'package:brownyplus/core/env/app_environment.dart';
+import 'package:brownyplus/core/env/app_environment.dart';
+import 'package:brownyplus/core/env/dev_environment.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:brownyplus/core/widgets/app_router.dart';
-import 'package:brownyplus/feature/home/view/home_screen.dart';
+import 'package:brownyplus/feature/authentication/view/on_boarding_screen.dart';
+import 'package:provider/provider.dart';
+// import 'package:brownyplus/feature/home/view/home_screen.dart';
 import 'package:brownyplus/res/theme/app_theme.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final appEnvironment = DevEnvironment(
+    appRouter: AppRouter(
+      initialLocation: OnBoardingScreen.pagePath,
+    ),
+  );
+
+  await appEnvironment.loadEnv();
+
+  runApp(MyApp(appEnvironment: appEnvironment));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({
+    required this.appEnvironment,
+    super.key,
+  });
+
+  final AppEvnironment appEnvironment;
 
   @override
   Widget build(BuildContext context) {
@@ -20,12 +37,14 @@ class MyApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (_, child) {
-        final router = AppRouter(initialLocation: HomeScreen.pagePath).router;
-        return MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          title: 'BrownyPlus',
-          theme: AppTheme.lightTheme,
-          routerConfig: router,
+        return ChangeNotifierProvider<AppEvnironment>.value(
+          value: appEnvironment,
+          child: MaterialApp.router(
+            debugShowCheckedModeBanner: false,
+            title: 'BrownyPlus',
+            theme: AppTheme.lightTheme,
+            routerConfig: appEnvironment.appRouter.router,
+          ),
         );
       },
     );

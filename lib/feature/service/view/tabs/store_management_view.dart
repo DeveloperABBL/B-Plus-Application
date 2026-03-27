@@ -1,10 +1,5 @@
 import 'package:brownyplus/core/core_index.dart';
-import 'package:brownyplus/res/icons/assets.gen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter/material.dart';
-import 'package:brownyplus/res/colors/app_colors.dart';
-import 'package:brownyplus/res/dims/app_dims.dart';
-import 'package:brownyplus/res/styles/app_text_styles.dart';
 
 class StoreManagementView extends StatefulWidget {
   const StoreManagementView({super.key});

@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:brownyplus/res/colors/app_colors.dart';
-import 'package:brownyplus/res/styles/app_text_styles.dart';
-import 'package:brownyplus/res/icons/assets.gen.dart';
-import 'package:brownyplus/core/widgets/top_back_button.dart';
 import 'package:go_router/go_router.dart';
+import 'package:brownyplus/core/providers/customer_provider.dart';
+import 'package:brownyplus/core/data/remote/app_client.dart';
+import 'package:brownyplus/core/env/app_environment.dart';
+import 'package:brownyplus/res/colors/app_colors.dart';
+import 'package:brownyplus/res/dims/app_dims.dart';
+import 'package:brownyplus/res/icons/assets.gen.dart';
+import 'package:brownyplus/res/styles/app_text_styles.dart';
+import 'package:provider/provider.dart';
+
+enum _PinMode {
+  create,
+  verify,
+}
 
 class PinScreen extends StatefulWidget {
   const PinScreen({super.key});
@@ -17,209 +27,460 @@ class PinScreen extends StatefulWidget {
 }
 
 class _PinScreenState extends State<PinScreen> {
-  String _pin = "";
+  late final AuthApi _authApi;
 
-  void _onKeyTap(String key) {
-    if (_pin.length < 6) {
+  _PinMode? _mode;
+  int _step = 1; // create mode: 1 = pin, 2 = confirm pin
+
+  String _pin = '';
+  String _confirmPin = '';
+
+  bool _isCheckingPin = true;
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _authApi = AuthApi.fromEnvironment(context.read<AppEvnironment>());
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _bootstrap();
+    });
+  }
+
+  Future<void> _bootstrap() async {
+    if (!AuthSession.hasCustomerId) {
       setState(() {
-        _pin += key;
+        _errorMessage = 'Missing customerId (please login again)';
+        _isCheckingPin = false;
       });
+      return;
     }
-    if (_pin.length == 6) {
-      // Navigate to Biometric screen after a short delay
-      Future.delayed(const Duration(milliseconds: 300), () {
-        if (mounted) {
-          context.push('/biometric_page');
-        }
-      });
+
+    setState(() {
+      _isCheckingPin = true;
+      _errorMessage = null;
+    });
+
+    final result = await _authApi.getPinFromServer(
+      customerId: AuthSession.customerId!,
+    );
+
+    if (!mounted) return;
+    setState(() {
+      _errorMessage = result.error;
+      _mode = result.hasPin ? _PinMode.verify : _PinMode.create;
+      _step = 1;
+      _pin = '';
+      _confirmPin = '';
+      _isCheckingPin = false;
+    });
+  }
+
+  String get _currentPin {
+    if (_mode == _PinMode.create) {
+      return _step == 1 ? _pin : _confirmPin;
     }
+    return _pin;
+  }
+
+  String _titleText() {
+    if (_mode == _PinMode.verify) {
+      return 'กรอกรหัส PIN 6 หลัก';
+    }
+    // create
+    return _step == 1 ? 'สร้างรหัส PIN 6 หลัก' : 'ยืนยันรหัส PIN';
+  }
+
+  Widget _buildHeader() {
+    final bool canGoBack = _mode == _PinMode.create && _step == 2;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppDims.size_16.w,
+        vertical: AppDims.size_8.h,
+      ),
+      child: Row(
+        children: [
+          ElevatedButton.icon(
+            onPressed: () {
+              if (canGoBack) {
+                setState(() {
+                  _step = 1;
+                  _confirmPin = '';
+                  _errorMessage = null;
+                });
+                return;
+              }
+              if (context.canPop()) {
+                context.pop();
+              }
+            },
+            icon: Icon(
+              Icons.arrow_back_ios_new,
+              color: AppColors.primary,
+              size: 24.sp,
+            ),
+            label: Text(
+              'ย้อนกลับ',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              minimumSize: Size(50.w, 40.h),
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              padding: EdgeInsets.zero,
+              elevation: 0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isCheckingPin) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (_mode == null) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(
+          child: Text(
+            _errorMessage ?? 'PIN init failed',
+            textAlign: TextAlign.center,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.error,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _buildHeader(),
+
+            SizedBox(height: AppDims.size_32.h),
+
+            // Logo Browny (ด้านบน)
+            _buildLogo(),
+
+            SizedBox(height: AppDims.size_24.h),
+
+            // Title
+            Text(
+              _titleText(),
+              style: AppTextStyles.headlineMedium.copyWith(
+                color: AppColors.textPrimary,
+              ),
+            ),
+
+            // Error message
+            if (_errorMessage != null && _errorMessage!.isNotEmpty)
+              Padding(
+                padding: EdgeInsets.only(
+                  left: AppDims.size_24.w,
+                  right: AppDims.size_24.w,
+                  top: AppDims.size_16.h,
+                ),
+                child: Text(
+                  _errorMessage!,
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.error,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+
+            SizedBox(height: AppDims.size_32.h),
+
+            // PIN indicators
+            _buildPinIndicators(),
+
+            const Spacer(),
+
+            if (_isLoading)
+              Padding(
+                padding: EdgeInsets.only(bottom: AppDims.size_24.h),
+                child: CircularProgressIndicator(
+                  color: AppColors.primary,
+                ),
+              )
+            else
+              _buildNumpad(),
+
+            SizedBox(height: AppDims.size_24.h),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogo() {
+    return Center(
+      child: Assets.png.setPin.image(
+        width: 90.w,
+        height: 90.h,
+      ),
+    );
+  }
+
+  Widget _buildPinIndicators() {
+    final currentPin = _currentPin;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        6,
+        (index) {
+          final isFilled = index < currentPin.length;
+          return Container(
+            margin: EdgeInsets.symmetric(horizontal: 10.w),
+            width: 20.w,
+            height: 20.h,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isFilled ? AppColors.primary : Colors.transparent,
+              border: Border.all(
+                color: AppColors.primary,
+                width: 2,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildNumpad() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: AppDims.size_32.w),
+      child: Column(
+        children: [
+          _buildNumpadRow(['1', '2', '3']),
+          SizedBox(height: AppDims.size_16.h),
+          _buildNumpadRow(['4', '5', '6']),
+          SizedBox(height: AppDims.size_16.h),
+          _buildNumpadRow(['7', '8', '9']),
+          SizedBox(height: AppDims.size_16.h),
+          _buildLastRow(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLastRow() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        const Expanded(child: SizedBox.shrink()),
+        Expanded(
+          child: _buildNumpadButton(
+            onTap: () => _onDigitTap('0'),
+            child: Text(
+              '0',
+              style: AppTextStyles.headlineLarge.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: _buildNumpadButton(
+            onTap: _onBackspace,
+            child: SvgPicture.asset(
+              Assets.svg.icBackspace,
+              width: 20.w,
+              height: 20.h,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNumpadRow(List<String> digits) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: digits.map((d) {
+        return Expanded(
+          child: _buildNumpadButton(
+            onTap: () => _onDigitTap(d),
+            child: Text(
+              d,
+              style: AppTextStyles.headlineLarge.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildNumpadButton({
+    required VoidCallback onTap,
+    required Widget child,
+  }) {
+    return Center(
+      child: InkWell(
+        onTap: _isLoading ? null : onTap,
+        splashColor: AppColors.checkboxSelectedBg,
+        borderRadius: BorderRadius.circular(40.r),
+        child: Container(
+          width: 80.w,
+          height: 80.h,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+          ),
+          child: Center(child: child),
+        ),
+      ),
+    );
   }
 
   void _onBackspace() {
-    if (_pin.isNotEmpty) {
+    if (_isLoading) return;
+
+    setState(() {
+      if (_mode == _PinMode.create) {
+        if (_step == 1) {
+          if (_pin.isNotEmpty) {
+            _pin = _pin.substring(0, _pin.length - 1);
+          }
+        } else {
+          if (_confirmPin.isNotEmpty) {
+            _confirmPin = _confirmPin.substring(
+              0,
+              _confirmPin.length - 1,
+            );
+          }
+        }
+      } else {
+        if (_pin.isNotEmpty) {
+          _pin = _pin.substring(0, _pin.length - 1);
+        }
+      }
+
+      _errorMessage = null;
+    });
+  }
+
+  void _onDigitTap(String digit) {
+    if (_isLoading) return;
+    if (_mode == _PinMode.create) {
+      if (_step == 1) {
+        if (_pin.length >= 6) return;
+        setState(() {
+          _pin += digit;
+          _errorMessage = null;
+        });
+
+        if (_pin.length == 6) {
+          Future.delayed(const Duration(milliseconds: 300), () {
+            if (!mounted) return;
+            setState(() {
+              _step = 2;
+              _confirmPin = '';
+              _errorMessage = null;
+            });
+          });
+        }
+        return;
+      }
+
+      // create step 2: confirm
+      if (_confirmPin.length >= 6) return;
       setState(() {
-        _pin = _pin.substring(0, _pin.length - 1);
+        _confirmPin += digit;
+        _errorMessage = null;
       });
+
+      if (_confirmPin.length == 6) {
+        Future.delayed(const Duration(milliseconds: 300), () async {
+          if (!mounted) return;
+
+          setState(() => _isLoading = true);
+
+          if (_pin != _confirmPin) {
+            setState(() {
+              _errorMessage = 'PIN ไม่ตรงกัน กรุณาลองใหม่';
+              _pin = '';
+              _confirmPin = '';
+              _step = 1;
+              _isLoading = false;
+            });
+            return;
+          }
+
+          final ok = await _authApi.setPin(
+            customerId: AuthSession.customerId!,
+            pin: _pin,
+          );
+
+          if (!mounted) return;
+          setState(() => _isLoading = false);
+          if (!ok) {
+            setState(() {
+              _errorMessage = 'ไม่สามารถบันทึก PIN ได้';
+              _pin = '';
+              _confirmPin = '';
+              _step = 1;
+            });
+            return;
+          }
+
+          context.push('/biometric_page');
+        });
+      }
+    } else {
+      // verify mode
+      if (_pin.length >= 6) return;
+      setState(() {
+        _pin += digit;
+        _errorMessage = null;
+      });
+
+      if (_pin.length == 6) {
+        Future.delayed(const Duration(milliseconds: 200), () async {
+          setState(() => _isLoading = true);
+
+          final ok = await _authApi.verifyPin(
+            customerId: AuthSession.customerId!,
+            pin: _pin,
+          );
+
+          if (!mounted) return;
+          setState(() => _isLoading = false);
+
+          if (!ok) {
+            setState(() {
+              _errorMessage = 'PIN ไม่ถูกต้อง กรุณาลองอีกครั้ง';
+              _pin = '';
+            });
+            return;
+          }
+
+          context.go('/home_page');
+        });
+      }
     }
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      body: Stack(
-        children: [
-          const TopBackButton(color: Color(0xFF2FBA38)),
-          Column(
-            children: [
-              const SizedBox(
-                height: 120,
-              ), // Compensation for moving TopBackButton out
-              Center(
-                child: Container(
-                  width: 90,
-                  height: 90,
-                  decoration: const BoxDecoration(
-                    color: AppColors.primary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: ClipOval(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Assets.png.setPin.image(),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'สร้างรหัส PIN 6 หลัก',
-                style: AppTextStyles.bodyLarge.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(6, (index) {
-                  bool isFilled = index < _pin.length;
-                  return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 13),
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isFilled ? AppColors.primary : AppColors.white,
-                      border: Border.all(color: AppColors.primary, width: 2),
-                    ),
-                  );
-                }),
-              ),
-              const SizedBox(height: 32),
-              _buildKeypad(),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildKeypad() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 50),
-      child: Column(
-        children: [
-          _buildKeyRow(['1', '2', '3']),
-          const SizedBox(height: 20),
-          _buildKeyRow(['4', '5', '6']),
-          const SizedBox(height: 20),
-          _buildKeyRow(['7', '8', '9']),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const SizedBox(width: 80),
-              _buildKeyButton('0'),
-              _BackspaceButton(onPressed: _onBackspace),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildKeyRow(List<String> keys) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: keys.map((key) => _buildKeyButton(key)).toList(),
-    );
-  }
-
-  Widget _buildKeyButton(String key) {
-    return _PinKeyButton(text: key, onTap: _onKeyTap);
-  }
 }
 
-class _PinKeyButton extends StatefulWidget {
-  final String text;
-  final Function(String) onTap;
-
-  const _PinKeyButton({required this.text, required this.onTap});
-
-  @override
-  State<_PinKeyButton> createState() => _PinKeyButtonState();
-}
-
-class _PinKeyButtonState extends State<_PinKeyButton> {
-  bool _isPressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) {
-        setState(() => _isPressed = false);
-        widget.onTap(widget.text);
-      },
-      onTapCancel: () => setState(() => _isPressed = false),
-      child: Container(
-        width: 75,
-        height: 75,
-        decoration: BoxDecoration(
-          color: _isPressed ? AppColors.primary : Colors.transparent,
-          shape: BoxShape.circle,
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          widget.text,
-          style: AppTextStyles.headlineSmall.copyWith(
-            color: _isPressed ? AppColors.white : AppColors.textPrimary,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _BackspaceButton extends StatefulWidget {
-  final VoidCallback onPressed;
-
-  const _BackspaceButton({required this.onPressed});
-
-  @override
-  State<_BackspaceButton> createState() => _BackspaceButtonState();
-}
-
-class _BackspaceButtonState extends State<_BackspaceButton> {
-  bool _isPressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) {
-        setState(() => _isPressed = false);
-        widget.onPressed();
-      },
-      onTapCancel: () => setState(() => _isPressed = false),
-      child: Container(
-        width: 75,
-        height: 75,
-        decoration: BoxDecoration(
-          color: _isPressed ? AppColors.primary : Colors.transparent,
-          shape: BoxShape.circle,
-        ),
-        alignment: Alignment.center,
-        child: SvgPicture.asset(
-          Assets.svg.icBackspace,
-          colorFilter: ColorFilter.mode(
-            _isPressed ? AppColors.white : AppColors.textPrimary,
-            BlendMode.srcIn,
-          ),
-          width: 28,
-          height: 28,
-        ),
-      ),
-    );
-  }
-}

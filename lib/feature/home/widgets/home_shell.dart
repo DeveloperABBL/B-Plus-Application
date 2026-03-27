@@ -130,7 +130,9 @@ class _HomeShellState extends State<HomeShell>
                   label: 'หน้าหลัก',
                   svgPath: Assets.svg.icHome,
                   selected: widget.currentIndex == 0,
-                  onTap: () {},
+                  onTap: () {
+                    context.push('/home');
+                  },
                 ),
                 _NavItem(
                   label: 'ร้าน',
@@ -143,7 +145,9 @@ class _HomeShellState extends State<HomeShell>
                   label: 'สแกน',
                   svgPath: Assets.svg.icScan,
                   selected: widget.currentIndex == 2,
-                  onTap: () {},
+                  onTap: () {
+                    context.push('/scanner');
+                  },
                 ),
                 _NavItem(
                   label: 'กระเป๋าเงิน',

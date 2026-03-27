@@ -7,6 +7,11 @@ import 'package:brownyplus/res/icons/assets.gen.dart';
 import 'package:brownyplus/res/styles/app_text_styles.dart';
 import 'package:brownyplus/feature/authentication/view/reset_password_screen.dart';
 import 'package:brownyplus/core/widgets/top_back_button.dart';
+import 'package:brownyplus/core/widgets/keyboard_dismissible.dart';
+import 'package:brownyplus/core/providers/customer_provider.dart';
+import 'package:brownyplus/core/data/remote/app_client.dart';
+import 'package:brownyplus/core/env/app_environment.dart';
+import 'package:provider/provider.dart';
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({super.key});
@@ -19,44 +24,86 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> {
-  final List<TextEditingController> _controllers = List.generate(
-    4,
-    (_) => TextEditingController(),
-  );
-  final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
+  final TextEditingController _otpController = TextEditingController();
+  final FocusNode _otpFocusNode = FocusNode();
 
   int _secondsRemaining = 60;
   Timer? _timer;
-  bool _hasError = false;
-  static const String _correctOtp = "1234";
+  bool _isLoading = false;
+  String? _errorMessage;
+  String _refCode = '';
 
   @override
   void initState() {
     super.initState();
-    _startTimer();
+    _otpFocusNode.addListener(() {
+      if (mounted) setState(() {});
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _bootstrap();
+    });
   }
 
-  void _startTimer() {
+  Future<void> _bootstrap() async {
+    final username = AuthSession.otpUsername;
+    if (username == null || username.isEmpty) {
+      setState(() {
+        _errorMessage = 'Missing OTP username';
+      });
+      return;
+    }
+    await _requestOtpAndStartTimer();
+  }
+
+  void _startTimer({required int seconds}) {
+    _secondsRemaining = seconds;
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return;
       if (_secondsRemaining > 0) {
-        setState(() {
-          _secondsRemaining--;
-        });
+        setState(() => _secondsRemaining--);
       } else {
-        _timer?.cancel();
+        timer.cancel();
       }
     });
+  }
+
+  Future<void> _requestOtpAndStartTimer() async {
+    final username = AuthSession.otpUsername;
+    if (username == null || username.isEmpty) return;
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final auth = AuthApi.fromEnvironment(context.read<AppEvnironment>());
+    final result = await auth.requestOtp(username: username);
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    if (!result.isSuccess) {
+      setState(() {
+        _errorMessage = result.error ?? 'Request OTP failed';
+        _secondsRemaining = 0;
+      });
+      return;
+    }
+
+    AuthSession.otpRefCode = result.refCode;
+    setState(() {
+      _refCode = result.refCode ?? '';
+    });
+
+    _startTimer(seconds: result.expiredInSeconds ?? 60);
   }
 
   @override
   void dispose() {
     _timer?.cancel();
-    for (var controller in _controllers) {
-      controller.dispose();
-    }
-    for (var node in _focusNodes) {
-      node.dispose();
-    }
+    _otpController.dispose();
+    _otpFocusNode.dispose();
     super.dispose();
   }
 
@@ -64,13 +111,16 @@ class _OtpScreenState extends State<OtpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF28C161),
-      body: Stack(
-        children: [
-          _buildGradientBackground(),
-          const TopBackButton(),
-          _buildLogo(),
-          _buildCard(context),
-        ],
+      resizeToAvoidBottomInset: true,
+      body: KeyboardDismissible(
+        child: Stack(
+          children: [
+            _buildGradientBackground(),
+            const TopBackButton(),
+            _buildLogo(),
+            _buildCard(context),
+          ],
+        ),
       ),
     );
   }
@@ -88,7 +138,6 @@ class _OtpScreenState extends State<OtpScreen> {
       ),
     );
   }
-
 
   Widget _buildLogo() {
     return SafeArea(
@@ -115,116 +164,140 @@ class _OtpScreenState extends State<OtpScreen> {
           borderRadius: BorderRadius.vertical(top: Radius.circular(32.r)),
         ),
         padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 40.h),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: 8.h),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "ยืนยันรหัสใช้ครั้งเดียว (OTP)",
-                style: AppTextStyles.titleLarge.copyWith(
-                  fontSize: 24.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            SizedBox(height: 4.h),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "กรอกรหัสใช้ครั้งเดียว 4 หลักเพื่อยืนยันบัญชี",
-                style: AppTextStyles.labelSmallSlim.copyWith(
-                  color: const Color(0xFF616161),
-                  fontSize: 14.sp,
-                ),
-              ),
-            ),
-            SizedBox(height: 15.h),
-            _buildOtpFields(),
-            SizedBox(height: 8.h),
-            _buildNextButton(context),
-            SizedBox(height: 15.h),
-            Text(
-              "รหัสอ้างอิง AR3WZJ",
-              style: AppTextStyles.labelSmallSlim.copyWith(
-                color: const Color(0xFF949494),
-                fontSize: 12.sp,
-              ),
-            ),
-            SizedBox(height: 8.h),
-            _buildResendCode(),
-            if (_secondsRemaining == 0 || _hasError) ...[
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
               SizedBox(height: 8.h),
-              Text(
-                "รหัส OTP ไม่ถูกต้อง กรุณาขอรหัสใหม่",
-                style: AppTextStyles.labelSmallSlim.copyWith(
-                  color: const Color(0xFFE53935),
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.bold,
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "ยืนยันรหัสใช้ครั้งเดียว (OTP)",
+                  style: AppTextStyles.titleLarge.copyWith(
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
+              SizedBox(height: 4.h),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "กรอกรหัสใช้ครั้งเดียว 4 หลักเพื่อยืนยันบัญชี",
+                  style: AppTextStyles.labelSmallSlim.copyWith(
+                    color: const Color(0xFF616161),
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+              SizedBox(height: 15.h),
+              _buildOtpFields(),
+              SizedBox(height: 8.h),
+              _buildNextButton(context),
+              SizedBox(height: 15.h),
+              Text(
+                "รหัสอ้างอิง $_refCode",
+                style: AppTextStyles.labelSmallSlim.copyWith(
+                  color: const Color(0xFF949494),
+                  fontSize: 12.sp,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              _buildResendCode(),
+              if (_errorMessage != null) ...[
+                SizedBox(height: 8.h),
+                Text(
+                  _errorMessage!,
+                  style: AppTextStyles.labelSmallSlim.copyWith(
+                    color: const Color(0xFFE53935),
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+              SizedBox(height: 24.h),
             ],
-            SizedBox(height: 190.h),
-          ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildOtpFields() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: List.generate(4, (index) {
-        return SizedBox(
-          width: 70.w,
-          height: 70.h,
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Hidden TextField overlaying the entire row
+        Opacity(
+          opacity: 0.0,
           child: TextField(
-            controller: _controllers[index],
-            focusNode: _focusNodes[index],
+            controller: _otpController,
+            focusNode: _otpFocusNode,
             keyboardType: TextInputType.number,
-            textAlign: TextAlign.center,
-            style: AppTextStyles.titleLarge.copyWith(
-              fontSize: 28.sp,
-              fontWeight: FontWeight.normal,
-              color: const Color(0xFF000000),
-            ),
-            maxLength: 1,
-            decoration: InputDecoration(
+            maxLength: 4,
+            autofocus: true,
+            showCursor: false,
+            cursorColor: Colors.transparent,
+            decoration: const InputDecoration(
               counterText: "",
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.r),
-                borderSide: BorderSide(
-                  color: (_hasError || _secondsRemaining == 0)
-                      ? const Color(0xFFE53935)
-                      : const Color(0xFFE0E0E0),
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.r),
-                borderSide: BorderSide(
-                  color: (_hasError || _secondsRemaining == 0)
-                      ? const Color(0xFFE53935)
-                      : const Color(0xFF15B34A),
-                ),
-              ),
+              border: InputBorder.none,
             ),
-            onChanged: (value) {
-              if (value.isNotEmpty && index < 3) {
-                _focusNodes[index + 1].requestFocus();
-              } else if (value.isEmpty && index > 0) {
-                _focusNodes[index - 1].requestFocus();
-              }
+            onChanged: (_) {
+              setState(() {});
             },
           ),
-        );
-      }),
+        ),
+        // Visual boxes
+        GestureDetector(
+          onTap: () => _otpFocusNode.requestFocus(),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.generate(4, (index) {
+              final isError =
+                  (_errorMessage ?? '').isNotEmpty || _secondsRemaining == 0;
+              final isFocused =
+                  _otpFocusNode.hasFocus &&
+                  (_otpController.text.length == index ||
+                      (_otpController.text.length == 4 && index == 3));
+              final char = _otpController.text.length > index
+                  ? _otpController.text[index]
+                  : "";
+
+              return Container(
+                width: 70.w,
+                height: 70.h,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8.r),
+                  border: Border.all(
+                    color: isError
+                        ? const Color(0xFFE53935)
+                        : (isFocused
+                              ? const Color(0xFF15B34A)
+                              : const Color(0xFFE0E0E0)),
+                    width: isFocused ? 2 : 1,
+                  ),
+                ),
+                child: Text(
+                  char,
+                  style: AppTextStyles.titleLarge.copyWith(
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.normal,
+                    color: const Color(0xFF000000),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildNextButton(BuildContext context) {
-    bool isComplete = _controllers.every((c) => c.text.isNotEmpty);
+    bool isComplete = _otpController.text.length == 4;
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -235,17 +308,48 @@ class _OtpScreenState extends State<OtpScreen> {
           }),
         ),
         onPressed: isComplete
-            ? () {
-                String enteredOtp = _controllers.map((c) => c.text).join();
-                if (enteredOtp == _correctOtp) {
-                  setState(() => _hasError = false);
-                  context.pushNamed(ResetPasswordScreen.pageName);
-                } else {
-                  setState(() => _hasError = true);
-                }
-              }
+            ? _isLoading
+                  ? null
+                  : () async {
+                      String enteredOtp = _otpController.text;
+                      final username = AuthSession.otpUsername;
+                      final refCode = AuthSession.otpRefCode;
+                      if (username == null ||
+                          refCode == null ||
+                          refCode.isEmpty) {
+                        setState(() => _errorMessage = 'Missing OTP ref_code');
+                        return;
+                      }
+
+                      setState(() {
+                        _isLoading = true;
+                        _errorMessage = null;
+                      });
+
+                      final auth = AuthApi.fromEnvironment(
+                        context.read<AppEvnironment>(),
+                      );
+                      final result = await auth.verifyOtp(
+                        username: username,
+                        refCode: refCode,
+                        otp: enteredOtp,
+                      );
+
+                      if (!mounted) return;
+                      setState(() => _isLoading = false);
+
+                      if (!result.isSuccess) {
+                        setState(() {
+                          _errorMessage = result.error ?? 'OTP invalid';
+                        });
+                        return;
+                      }
+
+                      AuthSession.customerId = result.customerId;
+                      context.pushNamed(ResetPasswordScreen.pageName);
+                    }
             : null,
-        child: const Text('ถัดไป'),
+        child: _isLoading ? const Text('กำลังตรวจสอบ...') : const Text('ถัดไป'),
       ),
     );
   }
@@ -262,13 +366,7 @@ class _OtpScreenState extends State<OtpScreen> {
       );
     } else {
       return TextButton(
-        onPressed: () {
-          setState(() {
-            _secondsRemaining = 60;
-            _hasError = false;
-            _startTimer();
-          });
-        },
+        onPressed: _isLoading ? null : _requestOtpAndStartTimer,
         child: Text(
           "ขอรหัสผ่านใหม่",
           style: AppTextStyles.labelSmallSlim.copyWith(
