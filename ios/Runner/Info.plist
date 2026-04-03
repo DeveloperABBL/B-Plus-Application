@@ -75,7 +75,9 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>This app needs camera access to scan QR codes</string>
+	<string>แอปต้องการใช้กล้องเพื่อสแกน QR Code</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>ใช้ Face ID เพื่อยืนยันตัวตนและเปิดใช้งานการเข้าสู่ระบบด้วย Biometric</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app needs photo library access to scan QR codes from images</string>
 </dict>

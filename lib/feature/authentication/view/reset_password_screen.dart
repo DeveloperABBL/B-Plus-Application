@@ -1,14 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
+import 'package:brownyplus/core/data/remote/auth_api.dart';
+import 'package:brownyplus/core/env/app_environment.dart';
+import 'package:brownyplus/core/providers/customer_provider.dart';
+import 'package:brownyplus/core/widgets/app_notification.dart';
+import 'package:brownyplus/core/widgets/keyboard_dismissible.dart';
+import 'package:brownyplus/core/widgets/top_back_button.dart';
 import 'package:brownyplus/res/colors/app_colors.dart';
 import 'package:brownyplus/res/icons/assets.gen.dart';
 import 'package:brownyplus/res/styles/app_text_styles.dart';
-import 'package:brownyplus/core/widgets/top_back_button.dart';
-import 'package:brownyplus/core/widgets/keyboard_dismissible.dart';
-import 'package:brownyplus/core/providers/customer_provider.dart';
-import 'package:brownyplus/core/data/remote/app_client.dart';
-import 'package:brownyplus/core/env/app_environment.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
@@ -233,9 +234,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 final customerId = AuthSession.customerId;
                 if (customerId == null || customerId.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Missing customer id'),
-                    ),
+                    const SnackBar(content: Text('Missing customer id')),
                   );
                   return;
                 }
@@ -262,13 +261,23 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
                 if (!ok) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('อัปเดตรหัสผ่านไม่สำเร็จ'),
-                    ),
+                    const SnackBar(content: Text('อัปเดตรหัสผ่านไม่สำเร็จ')),
                   );
                   return;
                 }
 
+                await AppNotification.show(
+                  context,
+                  title: 'สำเร็จ',
+                  message: 'รีเซตรหัสผ่านเรียบร้อยแล้ว',
+                  icon: const Icon(
+                    Icons.check_circle_outline,
+                    color: AppColors.white,
+                    size: 48,
+                  ),
+                  actionLabel: 'ตกลง',
+                );
+                if (!mounted) return;
                 context.go('/login_page');
               },
         child: _isLoading

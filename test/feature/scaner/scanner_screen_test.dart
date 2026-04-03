@@ -1,12 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:brownyplus/feature/scaner/view/scanner_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:brownyplus/feature/scaner/view/scanner_screen.dart';
 
 void main() {
-  testWidgets('ScannerScreen UI Test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() {
+    const channel = MethodChannel('flutter.baseflow.com/permissions/methods');
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, (MethodCall call) async {
+      switch (call.method) {
+        case 'checkPermissionStatus':
+          return 0; // PermissionStatus.denied
+        case 'requestPermissions':
+          // Permission.camera.value == 1
+          return <int, int>{1: 0};
+        case 'openAppSettings':
+          return true;
+        default:
+          return null;
+      }
+    });
+  });
+
+  tearDown(() {
+    const channel = MethodChannel('flutter.baseflow.com/permissions/methods');
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(channel, null);
+  });
+
+  testWidgets('ScannerScreen shows title and permission gate when camera denied',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       ScreenUtilInit(
         designSize: const Size(360, 690),
@@ -16,20 +43,14 @@ void main() {
       ),
     );
 
-    // Verify if ScannerScreen is rendered
     expect(find.byType(ScannerScreen), findsOneWidget);
 
-    // Verify title text
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
     expect(find.text('การสแกน'), findsOneWidget);
-
-    // Verify hint message text
-    expect(find.textContaining('กรุณาสแกนที่ QR Code'), findsOneWidget);
-
-    // Verify back button (SvgPicture)
-    expect(find.byType(SvgPicture), findsAtLeastNWidgets(2)); // Back and Scan icon
-
-    // Verify control buttons
-    expect(find.byIcon(Icons.image_outlined), findsOneWidget);
-    expect(find.byIcon(Icons.flash_off), findsOneWidget);
+    expect(find.text('ต้องการสิทธิ์ใช้กล้อง'), findsOneWidget);
+    expect(find.textContaining('เลือกรูป QR จากคลังภาพ'), findsOneWidget);
+    expect(find.byType(SvgPicture), findsWidgets);
   });
 }

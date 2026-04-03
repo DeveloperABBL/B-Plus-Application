@@ -113,7 +113,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
               SizedBox(height: 20.h),
               _buildPhoneField(),
-              SizedBox(height: 20.h),
+              SizedBox(height: 220.h),
               _buildNextButton(context),
               SizedBox(height: 30.h),
             ],

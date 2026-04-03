@@ -1,20 +1,48 @@
+import 'package:brownyplus/feature/authentication/screen/app_pin_page.dart';
+import 'package:brownyplus/feature/authentication/viewmodel/pin_biometric_viewmodel.dart';
+import 'package:flutter/material.dart';
+
+@Deprecated('Use CreateAppPinPage instead')
+class PinScreen extends StatelessWidget {
+  const PinScreen({super.key});
+
+  static const String pagePath = CreateAppPinPage.pagePath;
+  static const String pageName = CreateAppPinPage.pageName;
+
+  @override
+  Widget build(BuildContext context) {
+    return const CreateAppPinPage(process: PinBiometricPross.verifyByPin);
+  }
+}
+/*
+import 'package:brownyplus/feature/authentication/screen/app_pin_page.dart';
+import 'package:brownyplus/feature/authentication/viewmodel/pin_biometric_viewmodel.dart';
+import 'package:flutter/material.dart';
+
+@Deprecated('Use CreateAppPinPage instead')
+class PinScreen extends StatelessWidget {
+  const PinScreen({super.key});
+
+  static const String pagePath = CreateAppPinPage.pagePath;
+  static const String pageName = CreateAppPinPage.pageName;
+
+  @override
+  Widget build(BuildContext context) {
+    return const CreateAppPinPage(process: PinBiometricPross.create);
+  }
+}
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:brownyplus/core/providers/customer_provider.dart';
-import 'package:brownyplus/core/data/remote/app_client.dart';
+import 'package:brownyplus/core/data/remote/auth_api.dart';
 import 'package:brownyplus/core/env/app_environment.dart';
 import 'package:brownyplus/res/colors/app_colors.dart';
 import 'package:brownyplus/res/dims/app_dims.dart';
 import 'package:brownyplus/res/icons/assets.gen.dart';
 import 'package:brownyplus/res/styles/app_text_styles.dart';
 import 'package:provider/provider.dart';
-
-enum _PinMode {
-  create,
-  verify,
-}
 
 class PinScreen extends StatefulWidget {
   const PinScreen({super.key});
@@ -29,14 +57,15 @@ class PinScreen extends StatefulWidget {
 class _PinScreenState extends State<PinScreen> {
   late final AuthApi _authApi;
 
-  _PinMode? _mode;
-  int _step = 1; // create mode: 1 = pin, 2 = confirm pin
+  int _step = 1; // 1 = pin, 2 = confirm pin
 
   String _pin = '';
   String _confirmPin = '';
 
+  bool _hasExistingPin = false;
   bool _isCheckingPin = true;
   bool _isLoading = false;
+  bool _hasBootstrapError = false;
   String? _errorMessage;
 
   @override
@@ -49,8 +78,10 @@ class _PinScreenState extends State<PinScreen> {
   }
 
   Future<void> _bootstrap() async {
+    // ตรวจสอบสถานะเริ่มต้นของหน้า และเช็กว่าผู้ใช้เคยตั้ง PIN ไว้แล้วหรือยัง
     if (!AuthSession.hasCustomerId) {
       setState(() {
+        _hasBootstrapError = true;
         _errorMessage = 'Missing customerId (please login again)';
         _isCheckingPin = false;
       });
@@ -59,6 +90,7 @@ class _PinScreenState extends State<PinScreen> {
 
     setState(() {
       _isCheckingPin = true;
+      _hasBootstrapError = false;
       _errorMessage = null;
     });
 
@@ -67,9 +99,24 @@ class _PinScreenState extends State<PinScreen> {
     );
 
     if (!mounted) return;
+
+    if (result.hasPin) {
+      setState(() {
+        _hasExistingPin = true;
+        _hasBootstrapError = false;
+        _errorMessage = null;
+        _step = 1;
+        _pin = '';
+        _confirmPin = '';
+        _isCheckingPin = false;
+      });
+      return;
+    }
+
     setState(() {
+      _hasExistingPin = false;
+      _hasBootstrapError = result.error != null && result.error!.isNotEmpty;
       _errorMessage = result.error;
-      _mode = result.hasPin ? _PinMode.verify : _PinMode.create;
       _step = 1;
       _pin = '';
       _confirmPin = '';
@@ -77,23 +124,17 @@ class _PinScreenState extends State<PinScreen> {
     });
   }
 
-  String get _currentPin {
-    if (_mode == _PinMode.create) {
-      return _step == 1 ? _pin : _confirmPin;
-    }
-    return _pin;
-  }
+  String get _currentPin => _step == 1 ? _pin : _confirmPin;
 
+  // คืนค่าข้อความหัวข้อให้ตรงกับขั้นตอนปัจจุบันของการตั้ง PIN
   String _titleText() {
-    if (_mode == _PinMode.verify) {
-      return 'กรอกรหัส PIN 6 หลัก';
-    }
-    // create
+    if (_hasExistingPin) return 'กรอกรหัส PIN';
     return _step == 1 ? 'สร้างรหัส PIN 6 หลัก' : 'ยืนยันรหัส PIN';
   }
 
+  // สร้างส่วนหัวของหน้า พร้อมปุ่มย้อนกลับหรือย้อนกลับไปขั้นก่อนหน้า
   Widget _buildHeader() {
-    final bool canGoBack = _mode == _PinMode.create && _step == 2;
+    final bool canGoBack = !_hasExistingPin && _step == 2;
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -144,23 +185,17 @@ class _PinScreenState extends State<PinScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isCheckingPin) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    if (_mode == null) {
+    if (_hasBootstrapError) {
       return Scaffold(
         backgroundColor: AppColors.background,
         body: Center(
           child: Text(
             _errorMessage ?? 'PIN init failed',
             textAlign: TextAlign.center,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.error,
-            ),
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.error),
           ),
         ),
       );
@@ -169,164 +204,164 @@ class _PinScreenState extends State<PinScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildHeader(),
-
-            SizedBox(height: AppDims.size_32.h),
-
-            // Logo Browny (ด้านบน)
-            _buildLogo(),
-
-            SizedBox(height: AppDims.size_24.h),
-
-            // Title
-            Text(
-              _titleText(),
-              style: AppTextStyles.headlineMedium.copyWith(
-                color: AppColors.textPrimary,
-              ),
-            ),
-
-            // Error message
-            if (_errorMessage != null && _errorMessage!.isNotEmpty)
-              Padding(
-                padding: EdgeInsets.only(
-                  left: AppDims.size_24.w,
-                  right: AppDims.size_24.w,
-                  top: AppDims.size_16.h,
-                ),
-                child: Text(
-                  _errorMessage!,
-                  textAlign: TextAlign.center,
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.error,
-                    fontWeight: FontWeight.w600,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Column(
+              children: [
+                _buildHeader(),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      left: AppDims.size_24.w,
+                      right: AppDims.size_24.w,
+                      top: AppDims.size_8.h,
+                      bottom: AppDims.size_12.h,
+                    ),
+                    child: Column(
+                      children: [
+                        _buildLogo(),
+                        SizedBox(height: AppDims.size_24.h),
+                        Text(
+                          _titleText(),
+                          style: AppTextStyles.headlineMedium.copyWith(
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        SizedBox(height: AppDims.size_10.h),
+                        SizedBox(
+                          height: AppDims.size_24.h,
+                          child:
+                              _errorMessage != null && _errorMessage!.isNotEmpty
+                              ? Text(
+                                  _errorMessage!,
+                                  textAlign: TextAlign.center,
+                                  style: AppTextStyles.bodyMedium.copyWith(
+                                    color: AppColors.error,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                )
+                              : null,
+                        ),
+                        SizedBox(height: AppDims.size_12.h),
+                        _buildPinIndicators(),
+                        SizedBox(height: AppDims.size_24.h),
+                        Expanded(
+                          child: Align(
+                            alignment: Alignment.topCenter,
+                            child: _isLoading
+                                ? Padding(
+                                    padding: EdgeInsets.only(
+                                      top: AppDims.size_24.h,
+                                    ),
+                                    child: CircularProgressIndicator(
+                                      color: AppColors.primary,
+                                    ),
+                                  )
+                                : _buildNumpad(),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-
-            SizedBox(height: AppDims.size_32.h),
-
-            // PIN indicators
-            _buildPinIndicators(),
-
-            const Spacer(),
-
-            if (_isLoading)
-              Padding(
-                padding: EdgeInsets.only(bottom: AppDims.size_24.h),
-                child: CircularProgressIndicator(
-                  color: AppColors.primary,
-                ),
-              )
-            else
-              _buildNumpad(),
-
-            SizedBox(height: AppDims.size_24.h),
-          ],
+              ],
+            );
+          },
         ),
       ),
     );
   }
 
+  // แสดงโลโก้ประกอบบนหน้าตั้งค่า PIN
   Widget _buildLogo() {
     return Center(
-      child: Assets.png.setPin.image(
-        width: 90.w,
-        height: 90.h,
-      ),
+      child: Assets.png.setPin.image(width: 90.w, height: 90.h),
     );
   }
 
+  // แสดงจุดสถานะจำนวน 6 หลักตามจำนวนตัวเลขที่ผู้ใช้กรอก
   Widget _buildPinIndicators() {
     final currentPin = _currentPin;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(
-        6,
-        (index) {
-          final isFilled = index < currentPin.length;
-          return Container(
-            margin: EdgeInsets.symmetric(horizontal: 10.w),
-            width: 20.w,
-            height: 20.h,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isFilled ? AppColors.primary : Colors.transparent,
-              border: Border.all(
-                color: AppColors.primary,
-                width: 2,
-              ),
-            ),
-          );
-        },
-      ),
+      children: List.generate(6, (index) {
+        final isFilled = index < currentPin.length;
+        return Container(
+          margin: EdgeInsets.symmetric(horizontal: 8.w),
+          width: 18.w,
+          height: 18.w,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isFilled ? AppColors.primary : Colors.transparent,
+            border: Border.all(color: AppColors.primary, width: 2),
+          ),
+        );
+      }),
     );
   }
 
+  // สร้างชุดปุ่มตัวเลขสำหรับกรอก PIN
   Widget _buildNumpad() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: AppDims.size_32.w),
+    return SizedBox(
+      width: 260.w,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           _buildNumpadRow(['1', '2', '3']),
-          SizedBox(height: AppDims.size_16.h),
+          SizedBox(height: AppDims.size_12.h),
           _buildNumpadRow(['4', '5', '6']),
-          SizedBox(height: AppDims.size_16.h),
+          SizedBox(height: AppDims.size_12.h),
           _buildNumpadRow(['7', '8', '9']),
-          SizedBox(height: AppDims.size_16.h),
+          SizedBox(height: AppDims.size_12.h),
           _buildLastRow(),
         ],
       ),
     );
   }
 
+  // สร้างแถวสุดท้ายของแป้นตัวเลข โดยมีเลข 0 และปุ่มลบย้อนหลัง
   Widget _buildLastRow() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Expanded(child: SizedBox.shrink()),
-        Expanded(
-          child: _buildNumpadButton(
-            onTap: () => _onDigitTap('0'),
-            child: Text(
-              '0',
-              style: AppTextStyles.headlineLarge.copyWith(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w400,
-              ),
+        SizedBox(width: _numpadButtonSize.w, height: _numpadButtonSize.w),
+        _buildNumpadButton(
+          onTap: () => _onDigitTap('0'),
+          child: Text(
+            '0',
+            style: AppTextNumberStyles.titleLarge.copyWith(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
-        Expanded(
-          child: _buildNumpadButton(
-            onTap: _onBackspace,
-            child: SvgPicture.asset(
-              Assets.svg.icBackspace,
-              width: 20.w,
-              height: 20.h,
-            ),
+        _buildNumpadButton(
+          onTap: _onBackspace,
+          child: SvgPicture.asset(
+            Assets.svg.icBackspace,
+            width: 22.w,
+            height: 22.w,
           ),
         ),
       ],
     );
   }
 
+  static const double _numpadButtonSize = 60;
+
+  // สร้างแถวของปุ่มตัวเลขจากรายการตัวเลขที่ส่งเข้ามา
   Widget _buildNumpadRow(List<String> digits) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: digits.map((d) {
-        return Expanded(
-          child: _buildNumpadButton(
-            onTap: () => _onDigitTap(d),
-            child: Text(
-              d,
-              style: AppTextStyles.headlineLarge.copyWith(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w400,
-              ),
+        return _buildNumpadButton(
+          onTap: () => _onDigitTap(d),
+          child: Text(
+            d,
+            style: AppTextNumberStyles.titleLarge.copyWith(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w600,
             ),
           ),
         );
@@ -338,43 +373,34 @@ class _PinScreenState extends State<PinScreen> {
     required VoidCallback onTap,
     required Widget child,
   }) {
+    // สร้างปุ่มกดของแป้น PIN และปิดการกดระหว่างกำลังบันทึกข้อมูล
     return Center(
       child: InkWell(
         onTap: _isLoading ? null : onTap,
         splashColor: AppColors.checkboxSelectedBg,
-        borderRadius: BorderRadius.circular(40.r),
+        borderRadius: BorderRadius.circular((_numpadButtonSize / 2).r),
         child: Container(
-          width: 80.w,
-          height: 80.h,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-          ),
+          width: _numpadButtonSize.w,
+          height: _numpadButtonSize.w,
+          decoration: const BoxDecoration(shape: BoxShape.circle),
           child: Center(child: child),
         ),
       ),
     );
   }
 
+  // ลบตัวเลขล่าสุดของขั้นตอนปัจจุบันเมื่อผู้ใช้กดปุ่ม backspace
   void _onBackspace() {
     if (_isLoading) return;
 
     setState(() {
-      if (_mode == _PinMode.create) {
-        if (_step == 1) {
-          if (_pin.isNotEmpty) {
-            _pin = _pin.substring(0, _pin.length - 1);
-          }
-        } else {
-          if (_confirmPin.isNotEmpty) {
-            _confirmPin = _confirmPin.substring(
-              0,
-              _confirmPin.length - 1,
-            );
-          }
-        }
-      } else {
+      if (_step == 1) {
         if (_pin.isNotEmpty) {
           _pin = _pin.substring(0, _pin.length - 1);
+        }
+      } else {
+        if (_confirmPin.isNotEmpty) {
+          _confirmPin = _confirmPin.substring(0, _confirmPin.length - 1);
         }
       }
 
@@ -382,83 +408,21 @@ class _PinScreenState extends State<PinScreen> {
     });
   }
 
+  // จัดการการกดตัวเลข, สลับไปขั้นยืนยัน PIN และบันทึก PIN เมื่อข้อมูลครบ
   void _onDigitTap(String digit) {
     if (_isLoading) return;
-    if (_mode == _PinMode.create) {
-      if (_step == 1) {
-        if (_pin.length >= 6) return;
-        setState(() {
-          _pin += digit;
-          _errorMessage = null;
-        });
-
-        if (_pin.length == 6) {
-          Future.delayed(const Duration(milliseconds: 300), () {
-            if (!mounted) return;
-            setState(() {
-              _step = 2;
-              _confirmPin = '';
-              _errorMessage = null;
-            });
-          });
-        }
-        return;
-      }
-
-      // create step 2: confirm
-      if (_confirmPin.length >= 6) return;
-      setState(() {
-        _confirmPin += digit;
-        _errorMessage = null;
-      });
-
-      if (_confirmPin.length == 6) {
-        Future.delayed(const Duration(milliseconds: 300), () async {
-          if (!mounted) return;
-
-          setState(() => _isLoading = true);
-
-          if (_pin != _confirmPin) {
-            setState(() {
-              _errorMessage = 'PIN ไม่ตรงกัน กรุณาลองใหม่';
-              _pin = '';
-              _confirmPin = '';
-              _step = 1;
-              _isLoading = false;
-            });
-            return;
-          }
-
-          final ok = await _authApi.setPin(
-            customerId: AuthSession.customerId!,
-            pin: _pin,
-          );
-
-          if (!mounted) return;
-          setState(() => _isLoading = false);
-          if (!ok) {
-            setState(() {
-              _errorMessage = 'ไม่สามารถบันทึก PIN ได้';
-              _pin = '';
-              _confirmPin = '';
-              _step = 1;
-            });
-            return;
-          }
-
-          context.push('/biometric_page');
-        });
-      }
-    } else {
-      // verify mode
+    if (_hasExistingPin) {
       if (_pin.length >= 6) return;
+
       setState(() {
         _pin += digit;
         _errorMessage = null;
       });
 
       if (_pin.length == 6) {
-        Future.delayed(const Duration(milliseconds: 200), () async {
+        Future.delayed(const Duration(milliseconds: 300), () async {
+          if (!mounted) return;
+
           setState(() => _isLoading = true);
 
           final ok = await _authApi.verifyPin(
@@ -471,16 +435,95 @@ class _PinScreenState extends State<PinScreen> {
 
           if (!ok) {
             setState(() {
-              _errorMessage = 'PIN ไม่ถูกต้อง กรุณาลองอีกครั้ง';
+              _errorMessage = 'PIN ไม่ถูกต้อง กรุณาลองใหม่';
               _pin = '';
             });
             return;
           }
 
-          context.go('/home_page');
+          setState(() {
+            _pin = '';
+            _errorMessage = null;
+          });
+
+          context.push('/biometric_page');
         });
       }
+
+      return;
+    }
+
+    if (_step == 1) {
+      if (_pin.length >= 6) return;
+      setState(() {
+        _pin += digit;
+        _errorMessage = null;
+      });
+
+      if (_pin.length == 6) {
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (!mounted) return;
+          setState(() {
+            _step = 2;
+            _confirmPin = '';
+            _errorMessage = null;
+          });
+        });
+      }
+
+      return;
+    }
+
+    if (_confirmPin.length >= 6) return;
+    setState(() {
+      _confirmPin += digit;
+      _errorMessage = null;
+    });
+
+    if (_confirmPin.length == 6) {
+      Future.delayed(const Duration(milliseconds: 300), () async {
+        if (!mounted) return;
+
+        if (_pin != _confirmPin) {
+          setState(() {
+            _errorMessage = 'PIN ไม่ตรงกัน กรุณาลองใหม่';
+            _pin = '';
+            _confirmPin = '';
+            _step = 1;
+          });
+          return;
+        }
+
+        setState(() => _isLoading = true);
+
+        final ok = await _authApi.setPin(
+          customerId: AuthSession.customerId!,
+          pin: _pin,
+        );
+
+        if (!mounted) return;
+        setState(() => _isLoading = false);
+
+        if (!ok) {
+          setState(() {
+            _errorMessage = 'ไม่สามารถบันทึก PIN ได้';
+            _pin = '';
+            _confirmPin = '';
+            _step = 1;
+          });
+          return;
+        }
+
+        setState(() {
+          _pin = '';
+          _confirmPin = '';
+          _step = 1;
+          _errorMessage = null;
+        });
+
+        context.push('/biometric_page');
+      });
     }
   }
 }
-
+*/

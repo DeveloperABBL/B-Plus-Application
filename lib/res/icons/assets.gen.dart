@@ -11,6 +11,16 @@
 
 import 'package:flutter/widgets.dart';
 
+class $EnvGen {
+  const $EnvGen();
+
+  /// File path: env/dev.json
+  String get dev => 'env/dev.json';
+
+  /// List of all assets
+  List<String> get values => [dev];
+}
+
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
@@ -41,6 +51,9 @@ class $AssetsPngGen {
   AssetGenImage get patternBrowny =>
       const AssetGenImage('assets/png/PatternBrowny.png');
 
+  /// File path: assets/png/app_logo.png
+  AssetGenImage get appLogo => const AssetGenImage('assets/png/app_logo.png');
+
   /// File path: assets/png/b+.png
   AssetGenImage get b => const AssetGenImage('assets/png/b+.png');
 
@@ -48,7 +61,7 @@ class $AssetsPngGen {
   AssetGenImage get setPin => const AssetGenImage('assets/png/set_pin.png');
 
   /// List of all assets
-  List<AssetGenImage> get values => [patternBrowny, b, setPin];
+  List<AssetGenImage> get values => [patternBrowny, appLogo, b, setPin];
 }
 
 class $AssetsSvgGen {
@@ -59,6 +72,9 @@ class $AssetsSvgGen {
 
   /// File path: assets/svg/ic_back.svg
   String get icBack => 'assets/svg/ic_back.svg';
+
+  /// File path: assets/svg/ic_backspace.svg
+  String get icBackspace => 'assets/svg/ic_backspace.svg';
 
   /// File path: assets/svg/ic_bell.svg
   String get icBell => 'assets/svg/ic_bell.svg';
@@ -74,6 +90,9 @@ class $AssetsSvgGen {
 
   /// File path: assets/svg/ic_chat.svg
   String get icChat => 'assets/svg/ic_chat.svg';
+
+  /// File path: assets/svg/ic_checked.svg
+  String get icChecked => 'assets/svg/ic_checked.svg';
 
   /// File path: assets/svg/ic_eye-slash.svg
   String get icEyeSlash => 'assets/svg/ic_eye-slash.svg';
@@ -111,21 +130,17 @@ class $AssetsSvgGen {
   /// File path: assets/svg/ic_wallet.svg
   String get icWallet => 'assets/svg/ic_wallet.svg';
 
-  /// File path: assets/svg/ic_checked.svg
-  String get icChecked => 'assets/svg/ic_checked.svg';
-
-  /// File path: assets/svg/ic_backspace.svg
-  String get icBackspace => 'assets/svg/ic_backspace.svg';
-
   /// List of all assets
   List<String> get values => [
     icArrowRight,
     icBack,
+    icBackspace,
     icBell,
     icBox,
     icCalendar,
     icCalendarYellow,
     icChat,
+    icChecked,
     icEyeSlash,
     icEye,
     icForward,
@@ -233,6 +248,7 @@ class Assets {
   static const $AssetsImagesGen images = $AssetsImagesGen();
   static const $AssetsPngGen png = $AssetsPngGen();
   static const $AssetsSvgGen svg = $AssetsSvgGen();
+  static const $EnvGen env = $EnvGen();
 }
 
 class AssetGenImage {

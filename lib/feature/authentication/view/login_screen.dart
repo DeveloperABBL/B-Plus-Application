@@ -10,7 +10,7 @@ import 'package:brownyplus/feature/authentication/view/forgot_password_screen.da
 import 'package:brownyplus/core/widgets/top_back_button.dart';
 import 'package:brownyplus/core/widgets/keyboard_dismissible.dart';
 import 'package:brownyplus/core/providers/customer_provider.dart';
-import 'package:brownyplus/core/data/remote/app_client.dart';
+import 'package:brownyplus/core/data/remote/auth_api.dart';
 import 'package:brownyplus/core/env/app_environment.dart';
 import 'package:brownyplus/core/widgets/app_notification.dart';
 import 'package:provider/provider.dart';

@@ -1,7 +1,7 @@
 {
-    "host": "192.168.1.114",
-    "baseUrl": "http://192.168.1.114:8000/api",
-    "token": "8074cac22d628c5d71dbb635504e25a7fc04e05a5e4b327f30a20674bead82eb",
-    "serverKey": "base64:5vYEtLwRVbn4AVSB/RZXe23RxmY5fYkYT59wlrcFFdY=",
+    "host": "192.168.1.149",
+    "baseUrl": "http://192.168.1.149:8000/api",
+    "token": "59c4ff07cc4452b08b0b16a68795e8bc0ccb6ff87d4b5ad1b78d9746c2538b1a",
+    "serverKey": "base64:RI6F8x9Z2fefRIDsEjl/zkmP4Bs3JZewvqFBW7dy1is=",
     "LINE_Channel": "2009026542"
 }

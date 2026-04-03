@@ -7,4 +7,3 @@ class LoginCustomerResponse extends BaseResponse {
     super.errorType,
   });
 }
-

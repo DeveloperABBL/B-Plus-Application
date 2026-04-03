@@ -1,10 +1,13 @@
+import 'package:brownyplus/feature/scaner/view/scanner_screen.dart';
+import 'package:brownyplus/feature/shop/view/shop_screen.dart';
+import 'package:brownyplus/feature/wallet/view/wallet_screen.dart';
+import 'package:brownyplus/res/colors/app_colors.dart';
+import 'package:brownyplus/res/dims/app_dims.dart';
+import 'package:brownyplus/res/icons/assets.gen.dart';
+import 'package:brownyplus/res/styles/app_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:brownyplus/res/colors/app_colors.dart';
-import 'package:brownyplus/res/icons/assets.gen.dart';
-import 'package:brownyplus/res/dims/app_dims.dart';
-import 'package:brownyplus/res/styles/app_text_styles.dart';
 
 class HomeShell extends StatefulWidget {
   final Widget body;
@@ -63,6 +66,30 @@ class _HomeShellState extends State<HomeShell>
         _isMenuOpen = false;
         _animController.reverse();
       });
+    }
+  }
+
+  void _onBottomNavTap(int index) {
+    if (index == 2) {
+      Navigator.of(context, rootNavigator: true).push<void>(
+        MaterialPageRoute<void>(
+          fullscreenDialog: true,
+          builder: (_) => const ScannerScreen(),
+        ),
+      );
+      return;
+    }
+    if (widget.currentIndex == index) return;
+    switch (index) {
+      case 0:
+        context.go('/home_page');
+        break;
+      case 1:
+        context.go(ShopScreen.pagePath);
+        break;
+      case 3:
+        context.go(WalletScreen.pagePath);
+        break;
     }
   }
 
@@ -130,30 +157,26 @@ class _HomeShellState extends State<HomeShell>
                   label: 'หน้าหลัก',
                   svgPath: Assets.svg.icHome,
                   selected: widget.currentIndex == 0,
-                  onTap: () {
-                    context.push('/home');
-                  },
+                  onTap: () => _onBottomNavTap(0),
                 ),
                 _NavItem(
                   label: 'ร้าน',
                   svgPath: Assets.svg.icShop,
                   selected: widget.currentIndex == 1,
-                  onTap: () {},
+                  onTap: () => _onBottomNavTap(1),
                 ),
                 SizedBox(width: AppDims.size_60),
                 _NavItem(
                   label: 'สแกน',
                   svgPath: Assets.svg.icScan,
-                  selected: widget.currentIndex == 2,
-                  onTap: () {
-                    context.push('/scanner');
-                  },
+                  selected: false,
+                  onTap: () => _onBottomNavTap(2),
                 ),
                 _NavItem(
                   label: 'กระเป๋าเงิน',
                   svgPath: Assets.svg.icWallet,
                   selected: widget.currentIndex == 3,
-                  onTap: () {},
+                  onTap: () => _onBottomNavTap(3),
                 ),
               ],
             ),

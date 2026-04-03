@@ -3,19 +3,15 @@ import 'dart:convert';
 
 import 'package:brownyplus/core/core_index.dart';
 import 'package:brownyplus/core/data/api_configs.dart';
-import 'package:brownyplus/core/widgets/app_router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 class DevEnvironment extends AppEvnironment {
   DevEnvironment({
-    ApiConfigs? apiConfigs,
+    super.apiConfigs,
     // AppPreferences? appPreferences,
-    AppRouter? appRouter,
-  }) : super(
-         apiConfigs: apiConfigs,
-         appRouter: appRouter,
-       );
+    super.appRouter,
+  });
 
   @override
   Future<void> loadEnv() async {
@@ -31,10 +27,11 @@ class DevEnvironment extends AppEvnironment {
 
   @override
   String get laravelAppKey {
+    final fromEnvFile = apiConfig.serverKey;
+    if (fromEnvFile.isNotEmpty) return fromEnvFile;
     return const String.fromEnvironment('serverKey', defaultValue: '');
   }
 
-  @override
   // TODO: implement currentUser
   // CustomerProvider get currentUser => throw UnimplementedError();
 

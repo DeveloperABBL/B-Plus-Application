@@ -80,10 +80,18 @@ class AuthSession {
   /// ref_code ที่ได้จาก `request-otp`
   static String? otpRefCode;
 
+  /// สถานะเปิดใช้งาน biometric ของ session ปัจจุบัน
+  ///
+  /// ตอนนี้ยังเก็บแบบ in-memory เพื่อให้ flow หน้า PIN -> Biometric
+  /// ทำงานต่อเนื่องได้ก่อน ถ้าภายหลังต้องใช้ข้ามการเปิดแอป
+  /// ควรย้ายไป secure storage/shared preferences
+  static bool biometricEnabled = false;
+
   static void clear() {
     customerId = null;
     otpUsername = null;
     otpRefCode = null;
+    biometricEnabled = false;
   }
 
   static bool get hasCustomerId => (customerId ?? '').isNotEmpty;

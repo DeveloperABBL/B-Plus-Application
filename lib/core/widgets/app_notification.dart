@@ -1,5 +1,4 @@
 import 'package:brownyplus/core/core_index.dart';
-import 'package:flutter/material.dart';
 
 class AppNotification extends StatelessWidget {
   final String title;
