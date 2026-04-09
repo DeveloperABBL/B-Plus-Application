@@ -1,11 +1,19 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:dotted_line/dotted_line.dart';
 import 'package:brownyplus/core/widgets/app_text.dart';
 import 'package:brownyplus/feature/home/widgets/home_checkin_popup.dart';
 import 'package:brownyplus/res/colors/app_colors.dart';
-import 'package:brownyplus/res/icons/assets.gen.dart';
 import 'package:brownyplus/res/dims/app_dims.dart';
+import 'package:brownyplus/res/icons/assets.gen.dart';
+import 'package:dotted_line/dotted_line.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+void _showHomeCheckinPopup(BuildContext context) {
+  showDialog<void>(
+    context: context,
+    builder: (context) => const HomeCheckinPopup(),
+  );
+}
 
 class HomeCheckinCard extends StatelessWidget {
   const HomeCheckinCard({super.key});
@@ -13,120 +21,197 @@ class HomeCheckinCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const cardRadius = 5.0;
+    // ใช้วันปัจจุบันสำหรับการ์ดวันที่
+    final now = DateTime.now();
+    const thaiMonths = [
+      'มกราคม',
+      'กุมภาพันธ์',
+      'มีนาคม',
+      'เมษายน',
+      'พฤษภาคม',
+      'มิถุนายน',
+      'กรกฎาคม',
+      'สิงหาคม',
+      'กันยายน',
+      'ตุลาคม',
+      'พฤศจิกายน',
+      'ธันวาคม',
+    ];
+    final currentMonth = thaiMonths[now.month - 1];
+    final currentDay = now.day.toString();
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(AppDims.size_8),
-        border: Border.all(color: AppColors.ci2),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.08),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppDims.size_8),
-        child: Column(
-          children: [
-            // Header strip
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppDims.size_14,
-                vertical: AppDims.size_10,
-              ),
-              color: AppColors.ci3,
-              child: Row(
-                children: [
-                  Container(
-                    width: AppDims.size_26,
-                    height: AppDims.size_26,
-                    decoration: BoxDecoration(
-                      color: AppColors.ci2,
-                      borderRadius: BorderRadius.circular(AppDims.size_8),
-                    ),
-                    child: SvgPicture.asset(
-                      Assets.svg.icNote,
-                      width: AppDims.size_24,
-                      height: AppDims.size_24,
-                    ),
-                  ),
-                  AppDims.horizonPadding_10,
-                  Expanded(child: AppText.bodyBold('บันทึกเวลาเข้า-ออกงาน')),
-                ],
-              ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // ใช้ความกว้างเต็มพื้นที่ เพื่อลดช่องว่างด้านข้างของการ์ด
+        final cardWidth = constraints.maxWidth;
+
+        return Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            width: cardWidth,
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(AppDims.size_8),
+              border: Border.all(color: AppColors.ci2),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.black.withValues(alpha: 0.08),
+                  blurRadius: 14,
+                  offset: const Offset(0, 6),
+                ),
+              ],
             ),
-            const _DashedDivider(color: AppColors.ci2),
-            Padding(
-              padding: EdgeInsets.all(AppDims.size_12),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppDims.size_8),
               child: Column(
                 children: [
-                  SizedBox(
-                    height: 140,
+                  // แถบหัวการ์ด
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDims.size_12,
+                      vertical: AppDims.size_10,
+                    ),
+                    color: AppColors.ci3,
                     child: Row(
                       children: [
+                        Container(
+                          width: AppDims.size_26,
+                          height: AppDims.size_26,
+                          decoration: BoxDecoration(
+                            color: AppColors.ci2,
+                            borderRadius: BorderRadius.circular(AppDims.size_8),
+                          ),
+                          child: SvgPicture.asset(
+                            Assets.svg.icNote,
+                            width: AppDims.size_24,
+                            height: AppDims.size_24,
+                          ),
+                        ),
+                        AppDims.horizonPadding_10,
                         Expanded(
-                          child: _DateCard(
-                            radius: cardRadius,
-                            month: 'กุมภาพันธ์',
-                            day: '18',
-                            timeIn: '9.50',
-                          ),
-                        ),
-                        AppDims.horizonPadding_8,
-                        GestureDetector(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => const HomeCheckinPopup(),
-                            );
-                          },
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            alignment: Alignment.topCenter,
-                            children: [
-                              Assets.images.clock.clockin.image(height: 150),
-                              Positioned(
-                                top: -8,
-                                child:
-                                    Assets.images.clock.repeatBadge.image(),
-                              ),
-                            ],
-                          ),
-                        ),
-                        AppDims.horizonPadding_8,
-                        GestureDetector(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => const HomeCheckinPopup(),
-                            );
-                          },
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            alignment: Alignment.topCenter,
-                            children: [
-                              Assets.images.clock.clockedOut.image(height: 150),
-                            ],
-                          ),
+                          child: AppText.bodyBold('บันทึกเวลาเข้า-ออกงาน'),
                         ),
                       ],
                     ),
                   ),
-                  AppDims.vericalPadding_8,
-                  _BottomInfoBar(
-                    radius: cardRadius,
-                    leadingIcon: Icons.calendar_month_rounded,
-                    text: '14.00 น. : ซ่อมบำรุงร้าน',
-                    onTap: () {},
+                  const _DashedDivider(color: AppColors.ci2),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppDims.size_6,
+                      vertical: AppDims.size_12,
+                    ),
+                    child: Column(
+                      children: [
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            const itemGap = 6.0;
+                            // คงสัดส่วนภาพ PNG (clockin/clocked_out = 98x134)
+                            // และคำนวณความสูงของแถวจากความกว้างคอลัมน์รูปภาพ
+                            // เพื่อให้การ์ดแม่ขยายตามความสูงที่เหมาะสม
+                            final gapWidth = itemGap * 2;
+                            final rowWidth = constraints.maxWidth - gapWidth;
+
+                            const totalFlex = 14.0;
+                            final unitWidth = rowWidth / totalFlex;
+                            final imageColumnWidth = unitWidth * 4;
+
+                            const aspectRatio = 134.0 / 98.0; // สูง / กว้าง
+
+                            final rowHeight =
+                                imageColumnWidth * aspectRatio * 1.08;
+                            return SizedBox(
+                              height: rowHeight,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Expanded(
+                                    flex: 5,
+                                    child: _DateCard(
+                                      radius: cardRadius,
+                                      month: currentMonth,
+                                      day: currentDay,
+                                      timeIn: '9.50',
+                                    ),
+                                  ),
+                                  const SizedBox(width: itemGap),
+                                  Expanded(
+                                    flex: 4,
+                                    child: _CheckinActionImage(
+                                      onTap: () =>
+                                          _showHomeCheckinPopup(context),
+                                      image: Assets.images.clock.clockin,
+                                      badge: Assets.images.clock.repeatBadge,
+                                      badgeTop: -8,
+                                      badgeWidth: 65,
+                                    ),
+                                  ),
+                                  const SizedBox(width: itemGap),
+                                  Expanded(
+                                    flex: 4,
+                                    child: _CheckinActionImage(
+                                      onTap: () =>
+                                          _showHomeCheckinPopup(context),
+                                      image: Assets.images.clock.clockedOut,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                        AppDims.vericalPadding_8,
+                        _BottomInfoBar(
+                          radius: cardRadius,
+                          leadingIcon: Assets.svg.icCalendarYellow,
+                          text: '14.00 น. : ซ่อมบำรุงร้าน',
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// ปรับขนาดภาพเวลาเข้า/ออกให้พอดีกับคอลัมน์แคบโดยไม่ล้น Row
+class _CheckinActionImage extends StatelessWidget {
+  final VoidCallback onTap;
+  final AssetGenImage image;
+  final AssetGenImage? badge;
+  final double badgeTop;
+  final double? badgeWidth;
+
+  const _CheckinActionImage({
+    required this.onTap,
+    required this.image,
+    this.badge,
+    this.badgeTop = -8,
+    this.badgeWidth,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.topCenter,
+        children: [
+          // ให้รูปเติมเต็มกรอบของแถวเวลาอย่างพอดี
+          Positioned.fill(child: image.image(fit: BoxFit.contain)),
+          if (badge != null)
+            Positioned(
+              top: badgeTop,
+              child: badge!.image(width: badgeWidth),
+            ),
+        ],
       ),
     );
   }
@@ -134,7 +219,7 @@ class HomeCheckinCard extends StatelessWidget {
 
 class _BottomInfoBar extends StatelessWidget {
   final double radius;
-  final IconData leadingIcon;
+  final String leadingIcon;
   final String text;
   final VoidCallback onTap;
 
@@ -148,10 +233,13 @@ class _BottomInfoBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.paleOrange,
+      color: AppColors.yellow4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(radius),
-        side: const BorderSide(color: AppColors.yellow2, width: 1.5),
+        side: BorderSide(
+          color: AppColors.yellow5.withValues(alpha: 0.5),
+          width: 1.5,
+        ),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -168,7 +256,7 @@ class _BottomInfoBar extends StatelessWidget {
                 width: AppDims.size_28,
                 height: AppDims.size_28,
                 decoration: const BoxDecoration(
-                  color: AppColors.yellow2,
+                  color: AppColors.yellow5,
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
@@ -224,69 +312,108 @@ class _DateCard extends StatelessWidget {
       padding: EdgeInsets.all(AppDims.size_5),
       child: Column(
         children: [
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: AppDims.size_4),
-            decoration: BoxDecoration(
-              color: AppColors.ci3,
-              borderRadius: BorderRadius.circular(radius),
-            ),
-            alignment: Alignment.center,
-            child: AppText.caption(month, color: AppColors.textSecondary),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: AppDims.size_4),
+                decoration: BoxDecoration(
+                  color: AppColors.ci3,
+                  borderRadius: BorderRadius.circular(radius),
+                ),
+                alignment: Alignment.center,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: AppText.caption(
+                    month,
+                    color: AppColors.textSecondary,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+              AppDims.vericalPadding_4,
+              const _DashedDivider(color: AppColors.border),
+            ],
           ),
-          AppDims.vericalPadding_4,
-          const _DashedDivider(color: AppColors.border),
-          const Spacer(),
-          AppText.display(day),
-          const Spacer(),
-          const Divider(color: AppColors.border, height: 1, thickness: 1),
-          AppDims.vericalPadding_4,
-          Container(
-            padding: EdgeInsets.symmetric(vertical: AppDims.size_4),
-            decoration: BoxDecoration(
-              color: AppColors.inputFieldDefaultBg,
-              borderRadius: BorderRadius.circular(radius),
+          AppDims.vericalPadding_10,
+          Expanded(
+            child: Center(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: AppText.display(
+                  day,
+                  // คงขนาดตัวเลขให้เด่น แต่ไม่ให้ชนกันในหน้าจอแคบ
+                  fontSize: 44.sp,
+                  height: 0.9,
+                ),
+              ),
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      AppText.bodyBold(timeIn, color: AppColors.textSecondary),
-                      const SizedBox(height: 1),
-                      AppText.tiny('เวลาเข้า'),
-                    ],
-                  ),
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Divider(color: AppColors.border, height: 1, thickness: 1),
+              AppDims.vericalPadding_2,
+              Container(
+                padding: EdgeInsets.symmetric(vertical: AppDims.size_2),
+                decoration: BoxDecoration(
+                  color: AppColors.inputFieldDefaultBg,
+                  borderRadius: BorderRadius.circular(radius),
                 ),
-                Container(
-                  width: 1,
-                  height: 20,
-                  color: AppColors.border,
-                ),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Text(
-                        '-',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.gray500,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.center,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            AppText.bodyBold(
+                              timeIn,
+                              color: AppColors.textSecondary,
+                            ),
+                            const SizedBox(height: 1),
+                            AppText.tiny(
+                              'เวลาเข้า',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 1),
-                      Text(
-                        'เวลาออก',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.gray500,
+                    ),
+                    Container(width: 1, height: 20, color: AppColors.border),
+                    Expanded(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.center,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            AppText.bodyBold(
+                              timeIn,
+                              color: AppColors.textSecondary,
+                            ),
+                            const SizedBox(height: 1),
+                            AppText.tiny(
+                              'เวลาออก',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),

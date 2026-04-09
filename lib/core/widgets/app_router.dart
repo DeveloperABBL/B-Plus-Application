@@ -70,10 +70,8 @@ class AppRouter {
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
-          final navIndex =
-              navigationShell.currentIndex < 2 ? navigationShell.currentIndex : 3;
           return HomeShell(
-            currentIndex: navIndex,
+            currentIndex: navigationShell.currentIndex,
             body: navigationShell,
           );
         },
@@ -102,19 +100,13 @@ class AppRouter {
               ),
             ],
           ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: WalletScreen.pagePath,
-                name: WalletScreen.pageName,
-                pageBuilder: (context, state) => NoTransitionPage<void>(
-                  key: state.pageKey,
-                  child: const WalletScreen(),
-                ),
-              ),
-            ],
-          ),
         ],
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: WalletScreen.pagePath,
+        name: WalletScreen.pageName,
+        builder: (context, state) => const WalletScreen(),
       ),
       GoRoute(
         path: ServiceScreen.pagePath,

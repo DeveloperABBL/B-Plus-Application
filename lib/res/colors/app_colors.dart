@@ -181,7 +181,9 @@ class AppColors {
   static const Color textPrimary = Color(0xFF593817); // #593817 (Dark Brown)
 
   /// สีข้อความหลัก (เขียว)
-  static const Color textPrimaryGreen = Color(0xFF2FBA38); // #2FBA38 (Dark Brown)
+  static const Color textPrimaryGreen = Color(
+    0xFF2FBA38,
+  ); // #2FBA38 (Dark Brown)
 
   /// สีข้อความรอง (เทา)
   static const Color textSecondary = Color(0xFF777777); // #777777
@@ -306,6 +308,9 @@ class AppColors {
   /// Gray 400
   static const Color gray400 = Color(0xFFCDCDCD); // #CDCDCD
 
+  /// Gray 400
+  static const Color grayBg = Color(0xFFEFEFEF); // #CDCDCD
+
   /// CI (Corporate Identity) - สีเขียวหลัก
   static const Color ci = Color(0xFF2FBA38); // #2FBA38
 
@@ -336,6 +341,10 @@ class AppColors {
   static const Color yellow2 = Color(0xFFFFCD46); // #FFCD46
 
   static const Color yellow3 = Color(0xFFFFC21F); // #FFC21F
+
+  static const Color yellow4 = Color(0xFFFFFBDA); // #FFC21F
+
+  static const Color yellow5 = Color(0xFFFFF2C8); // #FFE29C
 
   // ============================================================================
   // Status Colors

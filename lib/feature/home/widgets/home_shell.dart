@@ -1,6 +1,4 @@
 import 'package:brownyplus/feature/scaner/view/scanner_screen.dart';
-import 'package:brownyplus/feature/shop/view/shop_screen.dart';
-import 'package:brownyplus/feature/wallet/view/wallet_screen.dart';
 import 'package:brownyplus/res/colors/app_colors.dart';
 import 'package:brownyplus/res/dims/app_dims.dart';
 import 'package:brownyplus/res/icons/assets.gen.dart';
@@ -85,10 +83,10 @@ class _HomeShellState extends State<HomeShell>
         context.go('/home_page');
         break;
       case 1:
-        context.go(ShopScreen.pagePath);
+        context.go('/service_page?tab=store');
         break;
       case 3:
-        context.go(WalletScreen.pagePath);
+        context.push('/wallet_page');
         break;
     }
   }
@@ -173,7 +171,7 @@ class _HomeShellState extends State<HomeShell>
                   onTap: () => _onBottomNavTap(2),
                 ),
                 _NavItem(
-                  label: 'กระเป๋าเงิน',
+                  label: 'การเงิน',
                   svgPath: Assets.svg.icWallet,
                   selected: widget.currentIndex == 3,
                   onTap: () => _onBottomNavTap(3),
@@ -391,7 +389,6 @@ class _FabMenuItemWidget extends StatelessWidget {
         item.svgPath!,
         width: item.radius * 0.75,
         height: item.radius * 0.75,
-        colorFilter: ColorFilter.mode(item.iconColor, BlendMode.srcIn),
       );
     }
 

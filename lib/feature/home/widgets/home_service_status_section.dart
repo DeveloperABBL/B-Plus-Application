@@ -1,9 +1,9 @@
+import 'package:brownyplus/res/colors/app_colors.dart';
+import 'package:brownyplus/res/dims/app_dims.dart';
+import 'package:brownyplus/res/icons/assets.gen.dart';
+import 'package:brownyplus/res/styles/app_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:brownyplus/res/colors/app_colors.dart';
-import 'package:brownyplus/res/icons/assets.gen.dart';
-import 'package:brownyplus/res/dims/app_dims.dart';
-import 'package:brownyplus/res/styles/app_text_styles.dart';
 
 class HomeServiceStatusSection extends StatelessWidget {
   const HomeServiceStatusSection({super.key});
@@ -164,8 +164,8 @@ class _StatusChip extends StatelessWidget {
     final (bg, fg, label) = switch (tone) {
       _StatusTone.success => (AppColors.ci3, AppColors.primary, 'ชำระแล้ว'),
       _StatusTone.warning => (
-        AppColors.paleOrange,
-        AppColors.textPrimary,
+        AppColors.yellow4,
+        AppColors.textSecondary,
         'ชำระโดยผู้จัดการสาขา',
       ),
       _StatusTone.neutral => (

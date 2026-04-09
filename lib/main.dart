@@ -16,7 +16,6 @@ Future<void> main() async {
   );
 
   await appEnvironment.loadEnv();
-
   runApp(MyApp(appEnvironment: appEnvironment));
 }
 

@@ -21,6 +21,48 @@ class $EnvGen {
   List<String> get values => [dev];
 }
 
+class $AssetsIcPaymentGen {
+  const $AssetsIcPaymentGen();
+
+  /// File path: assets/ic_payment/ic_alipay.png
+  AssetGenImage get icAlipay =>
+      const AssetGenImage('assets/ic_payment/ic_alipay.png');
+
+  /// File path: assets/ic_payment/ic_promptpay.png
+  AssetGenImage get icPromptpay =>
+      const AssetGenImage('assets/ic_payment/ic_promptpay.png');
+
+  /// File path: assets/ic_payment/ic_rabbit_linepay.png
+  AssetGenImage get icRabbitLinepay =>
+      const AssetGenImage('assets/ic_payment/ic_rabbit_linepay.png');
+
+  /// File path: assets/ic_payment/ic_shopeepay.png
+  AssetGenImage get icShopeepay =>
+      const AssetGenImage('assets/ic_payment/ic_shopeepay.png');
+
+  /// File path: assets/ic_payment/ic_tp_wallet.svg
+  String get icTpWallet => 'assets/ic_payment/ic_tp_wallet.svg';
+
+  /// File path: assets/ic_payment/ic_truemoney.png
+  AssetGenImage get icTruemoney =>
+      const AssetGenImage('assets/ic_payment/ic_truemoney.png');
+
+  /// File path: assets/ic_payment/ic_wechat.png
+  AssetGenImage get icWechat =>
+      const AssetGenImage('assets/ic_payment/ic_wechat.png');
+
+  /// List of all assets
+  List<dynamic> get values => [
+    icAlipay,
+    icPromptpay,
+    icRabbitLinepay,
+    icShopeepay,
+    icTpWallet,
+    icTruemoney,
+    icWechat,
+  ];
+}
+
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
@@ -57,11 +99,26 @@ class $AssetsPngGen {
   /// File path: assets/png/b+.png
   AssetGenImage get b => const AssetGenImage('assets/png/b+.png');
 
+  /// File path: assets/png/laundry_mc.png
+  AssetGenImage get laundryMc =>
+      const AssetGenImage('assets/png/laundry_mc.png');
+
+  /// File path: assets/png/promptpay.png
+  AssetGenImage get promptpay =>
+      const AssetGenImage('assets/png/promptpay.png');
+
   /// File path: assets/png/set_pin.png
   AssetGenImage get setPin => const AssetGenImage('assets/png/set_pin.png');
 
   /// List of all assets
-  List<AssetGenImage> get values => [patternBrowny, appLogo, b, setPin];
+  List<AssetGenImage> get values => [
+    patternBrowny,
+    appLogo,
+    b,
+    laundryMc,
+    promptpay,
+    setPin,
+  ];
 }
 
 class $AssetsSvgGen {
@@ -91,8 +148,20 @@ class $AssetsSvgGen {
   /// File path: assets/svg/ic_chat.svg
   String get icChat => 'assets/svg/ic_chat.svg';
 
+  /// File path: assets/svg/ic_chat2.svg
+  String get icChat2 => 'assets/svg/ic_chat2.svg';
+
   /// File path: assets/svg/ic_checked.svg
   String get icChecked => 'assets/svg/ic_checked.svg';
+
+  /// File path: assets/svg/ic_clock.svg
+  String get icClock => 'assets/svg/ic_clock.svg';
+
+  /// File path: assets/svg/ic_download.svg
+  String get icDownload => 'assets/svg/ic_download.svg';
+
+  /// File path: assets/svg/ic_dryer.svg
+  String get icDryer => 'assets/svg/ic_dryer.svg';
 
   /// File path: assets/svg/ic_eye-slash.svg
   String get icEyeSlash => 'assets/svg/ic_eye-slash.svg';
@@ -100,17 +169,38 @@ class $AssetsSvgGen {
   /// File path: assets/svg/ic_eye.svg
   String get icEye => 'assets/svg/ic_eye.svg';
 
+  /// File path: assets/svg/ic_face_id.svg
+  String get icFaceId => 'assets/svg/ic_face_id.svg';
+
   /// File path: assets/svg/ic_forward.svg
   String get icForward => 'assets/svg/ic_forward.svg';
 
+  /// File path: assets/svg/ic_gas.svg
+  String get icGas => 'assets/svg/ic_gas.svg';
+
+  /// File path: assets/svg/ic_headset_help.svg
+  String get icHeadsetHelp => 'assets/svg/ic_headset_help.svg';
+
   /// File path: assets/svg/ic_home.svg
   String get icHome => 'assets/svg/ic_home.svg';
+
+  /// File path: assets/svg/ic_home_heart.svg
+  String get icHomeHeart => 'assets/svg/ic_home_heart.svg';
+
+  /// File path: assets/svg/ic_iron.svg
+  String get icIron => 'assets/svg/ic_iron.svg';
+
+  /// File path: assets/svg/ic_laundry.svg
+  String get icLaundry => 'assets/svg/ic_laundry.svg';
 
   /// File path: assets/svg/ic_login.svg
   String get icLogin => 'assets/svg/ic_login.svg';
 
   /// File path: assets/svg/ic_media-image.svg
   String get icMediaImage => 'assets/svg/ic_media-image.svg';
+
+  /// File path: assets/svg/ic_more.svg
+  String get icMore => 'assets/svg/ic_more.svg';
 
   /// File path: assets/svg/ic_note.svg
   String get icNote => 'assets/svg/ic_note.svg';
@@ -127,9 +217,22 @@ class $AssetsSvgGen {
   /// File path: assets/svg/ic_shop.svg
   String get icShop => 'assets/svg/ic_shop.svg';
 
+  /// File path: assets/svg/ic_tp_wallet.svg
+  String get icTpWallet => 'assets/svg/ic_tp_wallet.svg';
+
+  /// File path: assets/svg/ic_vending_mc.svg
+  String get icVendingMc => 'assets/svg/ic_vending_mc.svg';
+
   /// File path: assets/svg/ic_wallet.svg
   String get icWallet => 'assets/svg/ic_wallet.svg';
 
+  /// File path: assets/svg/ic_money.svg
+  String get icMoney => 'assets/svg/ic_money.svg';
+
+  /// File path: assets/svg/ic_qr_code.svg
+  String get icQrCode => 'assets/svg/ic_qr_code.svg';
+
+  /// File path: assets/svg/ic_qr_code.svg
   /// List of all assets
   List<String> get values => [
     icArrowRight,
@@ -140,18 +243,31 @@ class $AssetsSvgGen {
     icCalendar,
     icCalendarYellow,
     icChat,
+    icChat2,
     icChecked,
+    icClock,
+    icDownload,
+    icDryer,
     icEyeSlash,
     icEye,
+    icFaceId,
     icForward,
+    icGas,
+    icHeadsetHelp,
     icHome,
+    icHomeHeart,
+    icIron,
+    icLaundry,
     icLogin,
     icMediaImage,
+    icMore,
     icNote,
     icOnboardFirst,
     icRefreshDouble,
     icScan,
     icShop,
+    icTpWallet,
+    icVendingMc,
     icWallet,
   ];
 }
@@ -245,6 +361,7 @@ class $AssetsImagesOrderGen {
 class Assets {
   const Assets._();
 
+  static const $AssetsIcPaymentGen icPayment = $AssetsIcPaymentGen();
   static const $AssetsImagesGen images = $AssetsImagesGen();
   static const $AssetsPngGen png = $AssetsPngGen();
   static const $AssetsSvgGen svg = $AssetsSvgGen();

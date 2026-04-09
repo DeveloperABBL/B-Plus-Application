@@ -45,6 +45,7 @@ flutter:
     - env/dev.json
     - assets/png/
     - assets/svg/
+    - assets/ic_payment/
     - assets/images/BrownyPlusLogo.png
     - assets/images/banner/
     - assets/images/clock/
